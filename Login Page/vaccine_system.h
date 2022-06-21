@@ -87,12 +87,12 @@ string encrypt(string username, string pass)
     return pass;
 }
 
-void print_error(string output)
-{
-    SetConsoleTextAttribute(h, 252);
-    cout << output;
-    SetConsoleTextAttribute(h, 240);
-}
+// void print_error(string output)
+// {
+//     SetConsoleTextAttribute(h, 252);
+//     cout << output;
+//     SetConsoleTextAttribute(h, 240);
+// }
 
 class Filing
 {
@@ -140,7 +140,7 @@ public:
         int count = 0;
         string line, word;
         string details[6];
-        //string o_username, fn, ln, em, No, cn;
+        //string o_username, fn, ln, em, cn, No;
 
         getline(details_file, line);
         stringstream str(line);
@@ -212,7 +212,7 @@ public:
 
         if (!details_file || !login_file)
         {
-            print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
+            //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
         }
         else                                 
         {                                    
@@ -230,11 +230,14 @@ public:
 
         if (!details_file)
         {
-            print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
+            //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
         }
         else
         {
-            details_file << obj.file_details();
+            for (int i = 0; i < size; i++)
+            {
+                details_file << arr[i].file_details();            
+            }
 
             details_file.close();
         }
@@ -273,12 +276,15 @@ public:
 
         if (!details_file)
         {
-            print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
+            //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
         }
         else
         {
-            details_file << obj.file_details();
-
+            for (int i = 0; i < size; i++)
+            {
+                details_file << arr[i].file_details();            
+            }
+            
             details_file.close();
         }
 
@@ -303,7 +309,7 @@ public:
         {
             if (username == o_username[i])
             {
-                login_output_file << obj.file_logindetails();
+                login_output_file << arr[i].file_logindetails();
             }
             else
             {
@@ -370,7 +376,7 @@ public:
 
         if (!details_file || !login_file)
         {
-            print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
+            //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
         }
         else
         {
@@ -381,18 +387,21 @@ public:
             login_file.close();
         }
     }
-    static void store_deleted_doctors(string username, admin* arr, int size)
+    static void store_deleted_doctors(string username, doctor* arr, int size)
     {
         ofstream details_file(FILE_PATH + "doctor_details.csv");
 
 
         if (!details_file)
         {
-            print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
+            //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
         }
         else
         {
-            details_file << obj.file_details();
+            for (int i = 0; i < size; i++)
+            {
+                details_file << arr[i].file_details();            
+            }
 
             details_file.close();
         }
@@ -424,19 +433,21 @@ public:
 
         login_output_file.close();
     }
-    static void store_updated_doctors(string username, admin* arr, int size)
+    static void store_updated_doctors(string username, doctor* arr, int size)
     {
         ofstream details_file(FILE_PATH + "doctor_details.csv");
 
 
         if (!details_file)
         {
-            print_error("\n\nERROR IN OPENING THE FILE: doctor_details.csv or admin_login_details.txt\n\n");
+            //print_error("\n\nERROR IN OPENING THE FILE: doctor_details.csv or admin_login_details.txt\n\n");
         }
         else
         {
-            details_file << obj.file_details();
-
+            for (int i = 0; i < size; i++)
+            {
+                details_file << arr[i].file_details();            
+            }
             details_file.close();
         }
 
@@ -461,7 +472,7 @@ public:
         {
             if (username == o_username[i])
             {
-                login_output_file << obj.file_logindetails();
+                login_output_file << arr[i].file_logindetails();
             }
             else
             {
@@ -527,7 +538,7 @@ public:
 
         if (!details_file || !login_file)
         {
-            print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
+            //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
         }
         else
         {
@@ -538,19 +549,21 @@ public:
             login_file.close();
         }
     }
-    static void store_deleted_fdos(string username, admin* arr, int size)
+    static void store_deleted_fdos(string username, fdo* arr, int size)
     {
         ofstream details_file(FILE_PATH + "fdo_details.csv");
 
 
         if (!details_file)
         {
-            print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
+            //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
         }
         else
         {
-            details_file << obj.file_details();
-
+            for (int i = 0; i < size; i++)
+            {
+                details_file << arr[i].file_details();            
+            }
             details_file.close();
         }
 
@@ -581,19 +594,21 @@ public:
 
         login_output_file.close();
     }
-    static void store_updated_fdos(string username, admin* arr, int size)
+    static void store_updated_fdos(string username, fdo* arr, int size)
     {
         ofstream details_file(FILE_PATH + "fdo_details.csv");
 
 
         if (!details_file)
         {
-            print_error("\n\nERROR IN OPENING THE FILE: fdo_details.csv or admin_login_details.txt\n\n");
+            //print_error("\n\nERROR IN OPENING THE FILE: fdo_details.csv or admin_login_details.txt\n\n");
         }
         else
         {
-            details_file << obj.file_details();
-
+            for (int i = 0; i < size; i++)
+            {
+                details_file << arr[i].file_details();            
+            }
             details_file.close();
         }
 
@@ -618,7 +633,7 @@ public:
         {
             if (username == o_username[i])
             {
-                login_output_file << obj.file_logindetails();
+                login_output_file << arr[i].file_logindetails();
             }
             else
             {
@@ -684,7 +699,7 @@ public:
 
         if (!details_file || !login_file)
         {
-            print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
+            //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
         }
         else
         {
@@ -695,19 +710,21 @@ public:
             login_file.close();
         }
     }
-    static void store_deleted_gov_offs(string username, admin* arr, int size)
+    static void store_deleted_gov_offs(string username, gov_off* arr, int size)
     {
         ofstream details_file(FILE_PATH + "gov_off_details.csv");
 
 
         if (!details_file)
         {
-            print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
+            //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
         }
         else
         {
-            details_file << obj.file_details();
-
+            for (int i = 0; i < size; i++)
+            {
+                details_file << arr[i].file_details();            
+            }
             details_file.close();
         }
 
@@ -738,19 +755,21 @@ public:
 
         login_output_file.close();
     }
-    static void store_updated_gov_offs(string username, admin* arr, int size)
+    static void store_updated_gov_offs(string username, gov_off* arr, int size)
     {
         ofstream details_file(FILE_PATH + "gov_off_details.csv");
 
 
         if (!details_file)
         {
-            print_error("\n\nERROR IN OPENING THE FILE: gov_off_details.csv or admin_login_details.txt\n\n");
+            //print_error("\n\nERROR IN OPENING THE FILE: gov_off_details.csv or admin_login_details.txt\n\n");
         }
         else
         {
-            details_file << obj.file_details();
-
+            for (int i = 0; i < size; i++)
+            {
+                details_file << arr[i].file_details();            
+            }
             details_file.close();
         }
 
@@ -775,7 +794,7 @@ public:
         {
             if (username == o_username[i])
             {
-                login_output_file << obj.file_logindetails();
+                login_output_file << arr[i].file_logindetails();
             }
             else
             {
