@@ -128,9 +128,7 @@ void login_page(string& username, string& pass)
 	cout << "\n" << pass << endl;
 
 }
-#include <iostream>
-#include <string>
-using namespace std;
+
 
 class person
 {
