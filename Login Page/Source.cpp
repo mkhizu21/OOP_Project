@@ -382,7 +382,7 @@ public:
 			cout << "Enter the username of doctor: ";
 			cin >> un;
 
-			i = find_doctor_index(un);
+			i = find_doctor_index(un)create_doctor;
 
 			if (i != -1)
 			{
@@ -395,6 +395,71 @@ public:
 		else
 		{
 			print_error("\n\n[!]ERROR: There is no doctor to update.\n\n");
+		}
+
+	}
+
+	void create_fdo()
+	{
+
+		expand<fdo>(fdo_list, fdo_count);
+
+		fdo_list[fdo_count - 1].input_login_details();
+		fdo_list[fdo_count - 1].input();
+
+		Filing::add_new_fdo(fdo_list[fdo_count - 1]);
+	}
+
+	void delete_fdo()
+	{
+		if (fdo_count > 0)
+		{
+			int i;
+			string un;
+			cout << "Enter the username of fdo: ";
+			cin >> un;
+
+			i = find_fdo_index(un);
+
+			if (i != -1)
+			{
+				del<fdo>(fdo_list, fdo_count, i);
+				fdo_count--;
+				Filing::store_deleted_fdos(un, fdo_list, fdo_count);
+			}
+			else
+			{
+				//error messages display karwa
+			}
+		}
+		else
+		{
+			print_error("\n\n[!]ERROR: There is no fdo to delete.\n\n");
+		}
+	}
+
+	void update_fdo()
+	{
+		if (fdo_count > 0)
+		{
+			int i;
+			string un;
+			cout << "Enter the username of fdo: ";
+			cin >> un;
+
+			i = find_fdo_index(un);
+
+			if (i != -1)
+			{
+				fdo_list[i].input_login_details();
+				fdo_list[i].input();
+
+				Filing::store_updated_fdos(un, fdo_list, fdo_count);
+			}
+		}
+		else
+		{
+			print_error("\n\n[!]ERROR: There is no fdo to update.\n\n");
 		}
 
 	}
