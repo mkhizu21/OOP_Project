@@ -529,7 +529,7 @@ void super_admin_page(string username)
 {
 	super_admin* SA = Filing::login_super_admin(username);
 	SA->output();
-	SA->create_admin();
+	SA->delete_admin();
 }
 
 void login_process(string username, string pass)

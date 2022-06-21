@@ -107,7 +107,6 @@ public:
         return ("The entered username already exists.");
     }
 };
-
 class invalid_username : public exception
 {
 
@@ -117,7 +116,6 @@ public:
         return ("The entered username is not valid.");
     }
 };
-
 class invalid_password : public exception
 {
 
@@ -238,7 +236,6 @@ class person
 {
 protected:
     string username, pass;
-private:
     string firstname, lastname, email, CNIC, contactNumber;
 
 public:
@@ -285,6 +282,18 @@ public:
             }
         } while (!is_valid_email(email));
         
+        cout << "Enter CNIC: ";
+        
+        do
+        {
+            cin >> CNIC;
+            if (!is_valid_cnic(CNIC))
+            {
+                print_error("\n[!] ERROR: The CNIC entered in not valid.\n\n");
+                cout << "Enter again: ";
+            }
+        } while (!is_valid_cnic(CNIC));
+
         cout << "Enter Contact Number: ";
         do
         {
@@ -297,17 +306,6 @@ public:
         } while (!is_valid_contact(contactNumber));
 
 
-        cout << "Enter CNIC: ";
-        
-        do
-        {
-            cin >> CNIC;
-            if (!is_valid_cnic(CNIC))
-            {
-                print_error("\n[!] ERROR: The CNIC entered in not valid.\n\n");
-                cout << "Enter again: ";
-            }
-        } while (!is_valid_cnic(CNIC));
         
     }
 
@@ -342,6 +340,17 @@ public:
         return username + " " + pass + "\n";
     }
 
+    void load_data(string un, string fn, string ln, string em, string cn, string No)
+    {
+        username = un;
+        firstname = fn;
+        lastname = ln;
+        email = em;
+        CNIC = cn;
+        contactNumber = No;
+    }
+    
+
     virtual void input_login_details() = 0; // inout username and password
 };
 
@@ -350,7 +359,9 @@ class admin : public person
 public:
     admin(): person(){}
     admin(string un, string fn, string ln, string em, string cn, string No);
+    
     void input_login_details();
+    
 };
 
 class fdo :public person 
@@ -535,6 +546,33 @@ public:
 
          return logined;
      }
+
+     static void initiate_all_admin(admin*& admin_list, int& admin_count)
+     {
+         ifstream details_file(FILE_PATH + "admin_details.csv");
+         int count = 0;
+         string line, word;
+         string details[6];
+         //string o_username, fn, ln, em, cn, No;
+         getline(details_file, line);
+         while (!details_file.eof())
+         {
+             count = 0;
+             stringstream str(line);
+
+             while (getline(str, word, ','))
+             {
+                 details[count++] = word;
+             }
+
+             expand<admin>(admin_list, admin_count);
+
+             admin_list[admin_count-1].load_data(details[0], details[1], details[2], details[3], details[4], details[5]);
+             getline(details_file, line);
+         }
+         
+     }
+
      static void add_new_admin(admin* obj)
      {
          ofstream details_file(FILE_PATH + "admin_details.csv", ios::app);
@@ -560,7 +598,7 @@ public:
 
          if (!details_file)
          {
-             //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
+             print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv\n\n");
          }
          else
          {
@@ -1137,68 +1175,12 @@ public:
 
  };
 
-
-     admin::admin(string un, string fn, string ln, string em, string cn, string No) : person(un, fn, ln, em, cn, No)
-     {
-
-     }
-
-     void admin::input_login_details()
-     {
-         string un, un_num, p; 
-         bool correct_input = false;
-
-         while (!correct_input)
-         {
-             try
-             {
-                 un = "AD";
-                 cout << "Enter the username: AD";
-                 cin >> un_num;
-
-                 if (!regex_match(un_num, valid_user_num))
-                 {
-                     throw invalid_username();
-                 }
-
-                 un += un_num; // concats the digits with "AD"
-
-                 if (Filing::find_admin(un))
-                 {
-                     throw username_exists();
-                 }
-
-                 cout << "\nEnter the password";
-                 cin >> p;
-
-                 if (!is_valid_password(p))
-                 {
-                     throw invalid_password();
-                 }
-
-                 correct_input = true;
-             }
-             catch (const exception& e)
-             {
-                 SetConsoleTextAttribute(h, 252);
-                 print_spaces();
-                 cout << "[!] Exception: " << e.what() << endl;
-                 SetConsoleTextAttribute(h, 240);
-             }
-         }
-             
-         username = un;
-         pass = p;
-
-
-     }
-
-
+ //-------------------------SUPER ADMIN DEFINATIONS------------------------------------------------------------------
      super_admin::super_admin(string un, string fn, string ln, string em, string cn, string No) : person(un, fn, ln, em, cn, No)
      {
          // read admin, fdo, doctor, government officials from file
-        admin_count = fdo_count = doctor_count = gov_off_count = 0;
-        admin_list = nullptr; 
+        fdo_count = doctor_count = gov_off_count = 0;
+        Filing::initiate_all_admin(admin_list, admin_count);
         fdo_list = nullptr;
         doctor_list = nullptr;
         gov_off_list = nullptr;
@@ -1290,7 +1272,7 @@ public:
              }
              else
              {
-                 //error messages display karwa
+                 print_error("[!] ERROR: The entered username doesn't exists.");
              }
          }
          else
@@ -1512,5 +1494,70 @@ public:
      void super_admin::input_login_details() {}
 
  super_admin* super_admin::self_instance = nullptr; // initialization
+
+
+ //----------------------------------------------------------------------------------------------------------------
+
+    
+//------------------------ ADMIN DEFINATIONS------------------------------------------------------------------
+    admin::admin(string un, string fn, string ln, string em, string cn, string No) : person(un, fn, ln, em, cn, No)
+     {
+
+     }
+
+    void admin::input_login_details()
+     {
+         string un, un_num, p; 
+         bool correct_input = false;
+
+         while (!correct_input)
+         {
+             try
+             {
+                 un = "AD";
+                 cout << "Enter the username: AD";
+                 cin >> un_num;
+
+                 if (!regex_match(un_num, valid_user_num))
+                 {
+                     throw invalid_username();
+                 }
+
+                 un += un_num; // concats the digits with "AD"
+
+                 if (Filing::find_admin(un))
+                 {
+                     throw username_exists();
+                 }
+
+                 cout << "\nEnter the password";
+                 cin >> p;
+
+                 if (!is_valid_password(p))
+                 {
+                     throw invalid_password();
+                 }
+
+                 correct_input = true;
+             }
+             catch (const exception& e)
+             {
+                 SetConsoleTextAttribute(h, 252);
+                 print_spaces();
+                 cout << "[!] Exception: " << e.what() << endl;
+                 SetConsoleTextAttribute(h, 240);
+             }
+         }
+             
+         username = un;
+         pass = encrypt(un, p);
+
+
+     }
+//----------------------------------------------------------------------------------------------------------------
+
+     
+
+
 
 

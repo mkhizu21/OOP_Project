@@ -1,0 +1,276 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+class person
+{
+private:
+	string firstname, lastname,email, CNIC;
+	long long int contactNumber;
+
+public:
+	person()
+	{
+		firstname = " ";
+		lastname = " ";
+		email = " ";
+		CNIC = " ";
+		contactNumber = 0;
+	}
+	person(string fn, string ln, string em, string cn, int No) : firstname(fn), lastname(ln), email(em), CNIC(cn), contactNumber(No){}
+	void input()
+	{
+		cout << "Enter First Name: ";
+		cin >> firstname;
+		cout << "Enter last Name: ";
+		cin >> lastname;
+		cout << "Enter Email Address: " ;
+		cin >> email;
+		cout << "Enter Contact Number: ";
+		cin >> contactNumber;
+		cout << "Enter CNIC: ";
+		cin >> CNIC;
+	}
+	void output()
+	{
+		cout << "First Name: " << firstname << endl;
+		cout << "last Name: " << lastname << endl;
+		cout << "Email Address: " << email << endl;
+		cout << "Contact Number: " << contactNumber << endl;
+		cout << "CNIC: " << CNIC << endl;
+	}
+};
+
+class vaccines
+{
+private:
+	string vaccineName;
+	string vaccineID;
+	int NoofVaccines;
+	int Nofdoses;
+public:
+	vaccines(){}
+	void vaccineInput()
+	{
+		cout << "Vaccine ID: ";
+		cin >> vaccineID;
+		cout << "Enter Vaccine Name: ";
+		cin >> vaccineName;
+		cout << "Enter no of doses: ";
+		cin >> Nofdoses;
+		cout << "Enter No of Vaccines: ";
+		cin >> NoofVaccines;
+	}
+	void vaccineOutput()
+	{
+		cout << "Vaccine ID: " << vaccineID << endl;
+		cout << "Vaccine Name: " << vaccineName << endl;
+		cout << "No. of doses: " << Nofdoses << endl;
+		cout << "No. of vaccines: " << NoofVaccines << endl;
+	}
+	void setvacNo(int VN)
+	{
+		NoofVaccines = VN;
+	}
+	string getvacName()
+	{
+		return vaccineName;
+	}
+	int getvacNo()
+	{
+		return NoofVaccines;
+	}
+};
+class company
+{
+private:
+	string companyName;
+	vaccines *vac;
+
+	 //taken from file
+public:
+	
+	void companyInput() //admin can add companies
+	{
+		cout << "Enter company name: ";
+		cin >> companyName;
+		vac->vaccineInput();
+	}
+	void companyoutput() //review company details
+	{
+		cout << "Company Name: " << companyName;
+		vac->vaccineOutput();
+	}
+	//friend void getvaccine(int buyvaccine, company comp, warehouse ware);
+};
+
+class warehouse
+{
+private:
+	vaccines * vac_ware;
+	string houseID; //to specify a warehouse
+	int limit;
+	int vaccineCount;//count type of vaccines in this warehouse
+	//location class will have composition here
+public:
+	warehouse()
+	{
+		vaccineCount = 0;
+	}
+	void houseInput()
+	{
+		cout << "Enter Warehouse ID: ";
+		cin >> houseID;
+		cout << "Enter Storage capacity: ";
+		cin >> limit;
+	}
+	void newvaccine()
+	{
+	vac_ware = new vaccines[vaccineCount + 1];
+	}
+	void storingvaccines(int storevac)
+	{
+		if (storevac < limit)
+		{
+			limit -= storevac;
+		}
+		else
+		{
+			cout << "not enough storage";
+		}
+	}
+	//friend void getvaccine(int buyvaccine, company comp, warehouse ware);
+};
+//void getvaccine(int buyvaccine, company comp, warehouse ware)
+//{
+//	if (buyvaccine <= comp.vac->getvacNo())
+//	{
+//		int VN = comp.vac->getvacNo();
+//		VN -= buyvaccine;
+//		comp.vac->setvacNo(VN);
+//		cout << "Enter warehouse ID for storage: ";
+//		cin >> ware.
+//	}
+//	else
+//	{
+//		cout << "not enough vaccines" << endl;
+//	}
+//}
+class vaccinationCenter
+{
+private:
+
+};
+class Admin: protected person
+{
+private:
+	string adminID;
+	company *comp;
+	warehouse *ware;
+public:
+	void input()
+	{
+		cout << "Enter Admin ID: ";
+		cin >> adminID;
+		person::input();
+	}
+	void output()
+	{
+		cout << "Admin ID: " << adminID << endl;
+		person::output();
+	}
+
+	//admin menu 1company
+	//in company buy vaccine then enter company name show the quantity they have get the vaccine warehouse id if space ok else another warehouse 
+	//2warehouse make warehouse review warehouses 
+	//3vaccinationcenter make centre review centres 
+	friend void admin_menu(Admin &ad);
+};
+void admin_menu(Admin &ad)
+{
+	int choice;
+	do
+	{
+		cout << "1.Company \n2.Warehouse \n3.Vaccination centres \nChoice: ";
+		cin >> choice;
+		switch (choice)
+		{
+		case 1:
+		{
+			int comp_choice;
+			cout << "1.Add company \n2.Review Companies \n3.Buy Vaccine \nChoice: ";
+			cin >> comp_choice;
+			switch (comp_choice)
+			{
+			case 1: 
+			{
+				ad.comp->companyInput();
+				break;
+			}
+			case 2:
+			{
+				ad.comp->companyoutput(); //it would be modified after filing to show all companies
+				break;
+			}
+			case 3: 
+			{
+				//void getvaccine(int buyvaccine, company comp, warehouse ware)
+				break;
+			}
+			default:
+				break;
+			}
+			break;
+		}
+		case 2:
+		{
+			int ware_choice;
+			cout << "1.Add warehouse \n2.Review warehouses \nChoice: ";
+			cin >> ware_choice;
+			switch (ware_choice)
+			{
+			case 1: 
+			{
+				ad.ware->houseInput();
+				break;
+			}
+			case 2:
+			{
+				//review warehouses
+				break;
+			}
+			default:
+				break;
+			}
+		}
+		case 3:
+		{
+			int vacCen_choice;
+			cout << "1.Add vaccination centre \n2.review vaccination cantres \nChoice: ";
+			cin >> vacCen_choice;
+			switch (vacCen_choice)
+			{
+			case 1:
+			{
+				//Input vaccination centres
+				break;
+			}
+			case 2:
+			{
+				//review vaccination cantres
+				break;
+			}
+			default:
+				break;
+			}
+		}
+		default:
+			break;
+		}
+	} while (true);
+}
+int main()
+{
+	
+	return 0;
+}
