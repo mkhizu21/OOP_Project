@@ -677,6 +677,113 @@ public:
 
         return logined;
     }
+    static void add_new_gov_off(gov_off& obj)
+    {
+        ofstream details_file(FILE_PATH + "gov_off_details.csv", ios::app);
+        ofstream login_file(FILE_PATH + "gov_off_login_details.txt", ios::app);
 
+        if (!details_file || !login_file)
+        {
+            print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
+        }
+        else
+        {
+            details_file << obj.file_details();
+            login_file << obj.file_logindetails();
+
+            details_file.close();
+            login_file.close();
+        }
+    }
+    static void store_deleted_gov_offs(string username, admin* arr, int size)
+    {
+        ofstream details_file(FILE_PATH + "gov_off_details.csv");
+
+
+        if (!details_file)
+        {
+            print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
+        }
+        else
+        {
+            details_file << obj.file_details();
+
+            details_file.close();
+        }
+
+        vector<string> o_username, o_pass;
+        string un, pass;
+        int count = 0;;
+
+        ifstream login_input_file(FILE_PATH + "gov_off_login_details.txt");
+
+        while (!login_input_file.eof())
+        {
+            login_input_file >> un >> pass;
+            o_username.push_back(un);
+            o_pass.push_back(pass);
+            count++;
+        }
+        login_input_file.close();
+
+        ofstream login_output_file(FILE_PATH + "gov_off_login_details.txt");
+
+        for (int i = 0; i < count; i++)
+        {
+            if (username != o_username[i])
+            {
+                login_output_file << o_username[i] << " " << o_pass[i] << endl;
+            }
+        }
+
+        login_output_file.close();
+    }
+    static void store_updated_gov_offs(string username, admin* arr, int size)
+    {
+        ofstream details_file(FILE_PATH + "gov_off_details.csv");
+
+
+        if (!details_file)
+        {
+            print_error("\n\nERROR IN OPENING THE FILE: gov_off_details.csv or admin_login_details.txt\n\n");
+        }
+        else
+        {
+            details_file << obj.file_details();
+
+            details_file.close();
+        }
+
+        vector<string> o_username, o_pass;
+        string un, pass;
+        int count = 0;;
+
+        ifstream login_input_file(FILE_PATH + "gov_off_login_details.txt");
+
+        while (!login_input_file.eof())
+        {
+            login_input_file >> un >> pass;
+            o_username.push_back(un);
+            o_pass.push_back(pass);
+            count++;
+        }
+        login_input_file.close();
+
+        ofstream login_output_file(FILE_PATH + "gov_off_login_details.txt");
+
+        for (int i = 0; i < count; i++)
+        {
+            if (username == o_username[i])
+            {
+                login_output_file << obj.file_logindetails();
+            }
+            else
+            {
+                login_output_file << o_username[i] << " " << o_pass[i] << endl;
+            }
+        }
+
+        login_output_file.close();
+    }
 	
 };

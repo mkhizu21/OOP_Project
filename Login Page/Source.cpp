@@ -188,7 +188,7 @@ public:
 class admin : public person{};
 class fdo : public person {};
 class doctor : public person {};
-class government_official : public person {};
+class gov_off : public person {};
 
 class super_admin : public person
 {
@@ -200,7 +200,7 @@ private:
 	admin* admin_list;
 	fdo* fdo_list;
 	doctor* doctor_list;
-	government_official* gov_off_list;
+	gov_off* gov_off_list;
 
 	super_admin(string un, string fn, string ln, string em, string cn, string No) : person(un, fn, ln, em, No, cn)
 	{
@@ -279,7 +279,6 @@ public:
 
 		Filing::add_new_admin(admin_list[admin_count - 1]);
 	}
-
 	void delete_admin()
 	{
 		if (admin_count > 0)
@@ -307,7 +306,6 @@ public:
 			print_error("\n\n[!]ERROR: There is no admin to delete.\n\n");
 		}
 	}
-
 	void update_admin()
 	{
 		if (admin_count > 0)
@@ -344,7 +342,6 @@ public:
 
 		Filing::add_new_doctor(doctor_list[doctor_count - 1]);
 	}
-
 	void delete_doctor()
 	{
 		if (doctor_count > 0)
@@ -372,7 +369,6 @@ public:
 			print_error("\n\n[!]ERROR: There is no doctor to delete.\n\n");
 		}
 	}
-
 	void update_doctor()
 	{
 		if (doctor_count > 0)
@@ -409,7 +405,6 @@ public:
 
 		Filing::add_new_fdo(fdo_list[fdo_count - 1]);
 	}
-
 	void delete_fdo()
 	{
 		if (fdo_count > 0)
@@ -437,7 +432,6 @@ public:
 			print_error("\n\n[!]ERROR: There is no fdo to delete.\n\n");
 		}
 	}
-
 	void update_fdo()
 	{
 		if (fdo_count > 0)
@@ -460,6 +454,69 @@ public:
 		else
 		{
 			print_error("\n\n[!]ERROR: There is no fdo to update.\n\n");
+		}
+
+	}
+
+	void create_gov_off()
+	{
+
+		expand<gov_off>(gov_off_list, gov_off_count);
+
+		gov_off_list[gov_off_count - 1].input_login_details();
+		gov_off_list[gov_off_count - 1].input();
+
+		Filing::add_new_gov_off(gov_off_list[gov_off_count - 1]);
+	}
+	void delete_gov_off()
+	{
+		if (gov_off_count > 0)
+		{
+			int i;
+			string un;
+			cout << "Enter the username of gov_off: ";
+			cin >> un;
+
+			i = find_gov_off_index(un);
+
+			if (i != -1)
+			{
+				del<gov_off>(gov_off_list, gov_off_count, i);
+				gov_off_count--;
+				Filing::store_deleted_gov_offs(un, gov_off_list, gov_off_count);
+			}
+			else
+			{
+				//error messages display karwa
+			}
+		}
+		else
+		{
+			print_error("\n\n[!]ERROR: There is no gov_off to delete.\n\n");
+		}
+	}
+	void update_gov_off()
+	{
+		if (gov_off_count > 0)
+		{
+			int i;
+			string un;
+			cout << "Enter the username of gov_off: ";
+			cin >> un;
+
+			i = find_gov_off_index(un);
+
+			if (i != -1)
+			{
+				gov_off_list[i].input_login_details();
+				gov_off_list[i].input();
+
+				Filing::store_updated_gov_offs(un, gov_off_list, gov_off_count);
+			}
+		}
+		else
+		{
+			print_error("\n\n[!]ERROR: There is no gov_off to update.\n\n");
 		}
 
 	}
