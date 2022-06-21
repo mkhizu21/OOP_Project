@@ -359,8 +359,9 @@ class vaccines
 private:
     string vaccineName;
     string vaccineID;
-    int NoofVaccines;
     int Nofdoses;
+    int price;
+    int batchNo;
 public:
     vaccines() {}
     void vaccineInput()
@@ -371,27 +372,44 @@ public:
         cin >> vaccineName;
         cout << "Enter no of doses: ";
         cin >> Nofdoses;
-        cout << "Enter No of Vaccines: ";
-        cin >> NoofVaccines;
+        cout << "Enter the price of vaccine";
+        cin >> price;
     }
     void vaccineOutput()
     {
         cout << "Vaccine ID: " << vaccineID << endl;
         cout << "Vaccine Name: " << vaccineName << endl;
         cout << "No. of doses: " << Nofdoses << endl;
-        cout << "No. of vaccines: " << NoofVaccines << endl;
+        cout << "Price of vaccine"<< price << endl;
     }
-    void setvacNo(int VN)
+
+    string file_details()
     {
-        NoofVaccines = VN;
+        return vaccineID + "," + vaccineName + "," + to_string(Nofdoses) + "," + to_string(price) + "," + to_string(batchNo) + ",\n";
     }
-    string getvacName()
+
+    void set_batchNo(int num)
+    {
+        batchNo = num;
+    }
+
+    string get_vacName()
     {
         return vaccineName;
     }
-    int getvacNo()
+
+    string get_vacID()
     {
-        return NoofVaccines;
+        return vaccineName;
+    }
+
+    int get_Nofdoses()
+    {
+        return Nofdoses;
+    }
+    int get_price()
+    {
+        return price;
     }
 };
 
@@ -415,6 +433,17 @@ public:
         cout << "Company Name: " << companyName;
         vac->vaccineOutput();
     }
+
+    string file_details()
+    {
+        return companyName + "," + vac->get_vacID() + "," + vac->get_vacName() + "," + to_string(vac->get_Nofdoses()) + "," + to_string(vac->get_price()) + ",\n" ;
+    }
+
+    bool compare_companyName(string n)
+    {
+        return n == companyName;
+    }
+
     //friend void getvaccine(int buyvaccine, company comp, warehouse ware);
 };
 
@@ -431,17 +460,26 @@ public:
     {
         vaccineCount = 0;
     }
+
     void houseInput()
     {
         cout << "Enter Warehouse ID: ";
         cin >> houseID;
         cout << "Enter Storage capacity: ";
         cin >> limit;
+
+        vaccineCount = 0;
     }
     void newvaccine()
     {
         vac_ware = new vaccines[vaccineCount + 1];
     }
+
+    string file_details()
+    {
+        return houseID + "," + to_string(limit) + "," + to_string(vaccineCount) + ",\n";
+    }
+
     void storingvaccines(int storevac)
     {
         if (storevac < limit)
@@ -480,17 +518,34 @@ private:
 class admin : public person
 {
 private:
+    int companies_count, warehouse_count, vacCen_count;
+
     company* companies_list;
+    warehouse* warehouses_list;
+    vaccinationCenter* vacCen_list;
+
+    int find_company_index(string n)
+    {
+        for (int i = 0; i < companies_count; i++)
+        {
+            if (companies_list[i].compare_companyName(n))
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
 
 public:
 
     admin(): person(){}
     admin(string un, string fn, string ln, string em, string cn, string No);
     
-    void input_login_details();
-
-
+    void add_company();
+    void delete_company();
     
+    void input_login_details();    
 };
 
 class fdo :public person 
@@ -1302,6 +1357,114 @@ public:
          login_output_file.close();
      }
 
+     static void add_new_company(company* obj)
+     {
+         ofstream details_file(FILE_PATH + "company_details.csv", ios::app);
+
+         if (!details_file)
+         {
+             //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
+         }
+         else
+         {
+             details_file << obj->file_details();
+
+             details_file.close();
+         }
+     }
+     static void store_deleted_companies(company* arr, int size)
+     {
+         ofstream details_file(FILE_PATH + "company_details.csv");
+
+
+         if (!details_file)
+         {
+             //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
+         }
+         else
+         {
+             for (int i = 0; i < size; i++)
+             {
+                 details_file << arr[i].file_details();
+             }
+             details_file.close();
+         }
+     }
+
+     static void add_new_warehouse(warehouse* obj)
+     {
+         ofstream details_file(FILE_PATH + "warhouse_details.csv", ios::app);
+
+         if (!details_file)
+         {
+             //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
+         }
+         else
+         {
+             details_file << obj->file_details();
+
+             details_file.close();
+         }
+     }
+     static void add_new_warehouse_vaccine(string ID, vaccines* obj)
+     {
+         ifstream details_file(FILE_PATH + "warhouse_details.csv");
+         ofstream temp(FILE_PATH + "temp.csv");
+
+         string line;
+         string warehouseID, limit, vacCount;
+
+         if (!details_file)
+         {
+             //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
+         }
+         else
+         {
+             
+             while (getline(details_file, line))
+             {
+                 stringstream str(line);
+                 getline(str, warehouseID, ',');
+                 getline(str, limit, ',');
+                 getline(str, vacCount, ',');
+
+                 temp << line;
+
+                 for (int i = 0; i < stoi(vacCount); i++)
+                 {
+                     getline(details_file, line);
+                     temp << line;
+                 }
+
+                 if (warehouseID == ID)
+                 {
+                     temp << obj->file_details();
+                 }
+                 
+             }
+
+             details_file.close();
+             temp.close();
+
+             ofstream details_file("warhouse_details.csv");
+             ifstream temp("temp.csv");
+
+             while (getline(temp, line))
+             {
+                 details_file << line;
+                 if (line[line.size() - 1] != '\n')
+                 {
+                     details_file << "\n"; //Pakistani tughe salaam :))
+                 }
+             }
+
+             details_file.close();
+             temp.close();
+         }
+     }
+
+     
+
  };
 
  //-------------------------SUPER ADMIN DEFINATIONS------------------------------------------------------------------
@@ -1688,6 +1851,43 @@ public:
 
 
      }
+
+    void admin::add_company()
+    {
+        expand<company>(companies_list, companies_count);
+
+        companies_list[companies_count - 1].companyInput();
+
+        Filing::add_new_company(&companies_list[companies_count - 1]);
+    }
+
+    void admin::delete_company()
+    {
+        if (companies_count > 0)
+        {
+            int i;
+            string n;
+            cout << "Enter the name of company: ";
+            cin >> n;
+
+            i = find_company_index(n);
+
+            if (i != -1)
+            {
+                del<company>(companies_list, companies_count, i);
+                companies_count--;
+                Filing::store_deleted_companies(companies_list, companies_count);
+            }
+            else
+            {
+                print_error("[!] ERROR: The entered name doesn't exists.");
+            }
+        }
+        else
+        {
+            print_error("\n\n[!]ERROR: There is no company to delete.\n\n");
+        }
+    }
 //----------------------------------------------------------------------------------------------------------------
 
      
