@@ -334,6 +334,72 @@ public:
 			
 	}
 
+	void create_doctor()
+	{
+
+		expand<doctor>(doctor_list, doctor_count);
+
+		doctor_list[doctor_count - 1].input_login_details();
+		doctor_list[doctor_count - 1].input();
+
+		Filing::add_new_doctor(doctor_list[doctor_count - 1]);
+	}
+
+	void delete_doctor()
+	{
+		if (doctor_count > 0)
+		{
+			int i;
+			string un;
+			cout << "Enter the username of doctor: ";
+			cin >> un;
+
+			i = find_doctor_index(un);
+
+			if (i != -1)
+			{
+				del<doctor>(doctor_list, doctor_count, i);
+				doctor_count--;
+				Filing::store_deleted_doctors(un, doctor_list, doctor_count);
+			}
+			else
+			{
+				//error messages display karwa
+			}
+		}
+		else
+		{
+			print_error("\n\n[!]ERROR: There is no doctor to delete.\n\n");
+		}
+	}
+
+	void update_doctor()
+	{
+		if (doctor_count > 0)
+		{
+			int i;
+			string un;
+			cout << "Enter the username of doctor: ";
+			cin >> un;
+
+			i = find_doctor_index(un);
+
+			if (i != -1)
+			{
+				doctor_list[i].input_login_details();
+				doctor_list[i].input();
+
+				Filing::store_updated_doctors(un, doctor_list, doctor_count);
+			}
+		}
+		else
+		{
+			print_error("\n\n[!]ERROR: There is no doctor to update.\n\n");
+		}
+
+	}
+
+
 
 	void input_login_details(){}
 
