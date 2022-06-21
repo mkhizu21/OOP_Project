@@ -1308,11 +1308,13 @@ public:
      super_admin::super_admin(string un, string fn, string ln, string em, string cn, string No) : person(un, fn, ln, em, cn, No)
      {
          // read admin, fdo, doctor, government officials from file
-        fdo_count = doctor_count = gov_off_count = 0;
-        Filing::initiate_all_admin(admin_list, admin_count);
+        admin_count = fdo_count = doctor_count = gov_off_count = 0;
+        admin_list = nullptr;
         fdo_list = nullptr;
         doctor_list = nullptr;
         gov_off_list = nullptr;
+        
+        Filing::initiate_all_admin(admin_list, admin_count);
      }
      int super_admin::find_admin_index(string un)
      {
