@@ -9,9 +9,9 @@
 using namespace std;
 
 
-regex valid_email("[a-zA-Z_0-9]+@[a-zA-Z0-9]+\\.[a-zA-Z]+");
-regex valid_contact_num("(03)[0-9][0-9]-[0-9]{7}");
-regex valid_user_num("[0-9][0-9][0-9][0-9][0-9]");
+regex valid_email("[a-zA-Z_0-9]+@[a-zA-Z0-9]+.[a-zA-Z]+");
+regex valid_contact_num("(03)[0-9]{2}-[0-9]{7}");
+regex valid_user_num("[0-9]{5}");
 regex valid_cnic("[0-9]{5}-[0-9]{7}-[0-9]");
 regex valid_name ("[A-Za-z]+");
 
@@ -193,14 +193,14 @@ string encrypt(string username, string pass)
         key += username[i] - 48; // converting char number into integar
     }
 
-    cout << "key " << key << endl;
+    //cout << "key " << key << endl;
 
     // coverts the entered password into encrypted one to compare with the original
     for (int i = 0; i < pass.size(); i++)
     {
 
         pass[i] += key;
-        cout << int(pass[i]) << endl;
+        //cout << int(pass[i]) << endl;
 
         if (int(pass[i]) < 0) // makes sure ASCII doesn't go in negative value
         {
@@ -211,7 +211,7 @@ string encrypt(string username, string pass)
         {
             pass[i] -= 1;
         }
-        cout << int(pass[i]) << endl;
+        //cout << int(pass[i]) << endl;
     }
 
     return pass;
@@ -354,13 +354,142 @@ public:
     virtual void input_login_details() = 0; // inout username and password
 };
 
+class vaccines
+{
+private:
+    string vaccineName;
+    string vaccineID;
+    int NoofVaccines;
+    int Nofdoses;
+public:
+    vaccines() {}
+    void vaccineInput()
+    {
+        cout << "Vaccine ID: ";
+        cin >> vaccineID;
+        cout << "Enter Vaccine Name: ";
+        cin >> vaccineName;
+        cout << "Enter no of doses: ";
+        cin >> Nofdoses;
+        cout << "Enter No of Vaccines: ";
+        cin >> NoofVaccines;
+    }
+    void vaccineOutput()
+    {
+        cout << "Vaccine ID: " << vaccineID << endl;
+        cout << "Vaccine Name: " << vaccineName << endl;
+        cout << "No. of doses: " << Nofdoses << endl;
+        cout << "No. of vaccines: " << NoofVaccines << endl;
+    }
+    void setvacNo(int VN)
+    {
+        NoofVaccines = VN;
+    }
+    string getvacName()
+    {
+        return vaccineName;
+    }
+    int getvacNo()
+    {
+        return NoofVaccines;
+    }
+};
+
+class company
+{
+private:
+    string companyName;
+    vaccines* vac;
+
+    //taken from file
+public:
+
+    void companyInput() //admin can add companies
+    {
+        cout << "Enter company name: ";
+        cin >> companyName;
+        vac->vaccineInput();
+    }
+    void companyoutput() //review company details
+    {
+        cout << "Company Name: " << companyName;
+        vac->vaccineOutput();
+    }
+    //friend void getvaccine(int buyvaccine, company comp, warehouse ware);
+};
+
+class warehouse
+{
+private:
+    vaccines* vac_ware;
+    string houseID; //to specify a warehouse
+    int limit;
+    int vaccineCount;//count type of vaccines in this warehouse
+    //location class will have composition here
+public:
+    warehouse()
+    {
+        vaccineCount = 0;
+    }
+    void houseInput()
+    {
+        cout << "Enter Warehouse ID: ";
+        cin >> houseID;
+        cout << "Enter Storage capacity: ";
+        cin >> limit;
+    }
+    void newvaccine()
+    {
+        vac_ware = new vaccines[vaccineCount + 1];
+    }
+    void storingvaccines(int storevac)
+    {
+        if (storevac < limit)
+        {
+            limit -= storevac;
+        }
+        else
+        {
+            cout << "not enough storage";
+        }
+    }
+    //friend void getvaccine(int buyvaccine, company comp, warehouse ware);
+};
+//void getvaccine(int buyvaccine, company comp, warehouse ware)
+//{
+//	if (buyvaccine <= comp.vac->getvacNo())
+//	{
+//		int VN = comp.vac->getvacNo();
+//		VN -= buyvaccine;
+//		comp.vac->setvacNo(VN);
+//		cout << "Enter warehouse ID for storage: ";
+//		cin >> ware.
+//	}
+//	else
+//	{
+//		cout << "not enough vaccines" << endl;
+//	}
+//}
+
+class vaccinationCenter
+{
+private:
+
+};
+
 class admin : public person
 {
+private:
+    company* companies_list;
+
 public:
+
     admin(): person(){}
     admin(string un, string fn, string ln, string em, string cn, string No);
     
     void input_login_details();
+
+
     
 };
 
@@ -1305,6 +1434,7 @@ public:
          }
 
      }
+
      void super_admin::create_doctor()
      {
 
@@ -1367,6 +1497,7 @@ public:
          }
 
      }
+
      void super_admin::create_fdo()
      {
 
@@ -1429,6 +1560,7 @@ public:
          }
 
      }
+
      void super_admin::create_gov_off()
      {
 

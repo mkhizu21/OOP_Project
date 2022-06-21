@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="username_exists" Collapsed="true">
+    <Position X="14" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>vaccine_system.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="invalid_username">
+    <Position X="12.25" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>vaccine_system.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="invalid_password" Collapsed="true">
+    <Position X="15.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>vaccine_system.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="person">
+    <Position X="5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAABhQAAAkAAAAgAEACBAAABAAIIAAAACAAAA=</HashCode>
+      <FileName>vaccine_system.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="vaccines">
+    <Position X="12.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAECAAAAAAAAAAAAAAQAAAAAAAAFEICAQAAgAAAAAAA=</HashCode>
+      <FileName>vaccine_system.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="company">
+    <Position X="10.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAABAAEA=</HashCode>
+      <FileName>vaccine_system.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="warehouse">
+    <Position X="14" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAABABAAIAAAAAgAQIEAAAAAAAAAAAgAAAA=</HashCode>
+      <FileName>vaccine_system.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="vaccinationCenter" Collapsed="true">
+    <Position X="16.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>vaccine_system.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="admin">
+    <Position X="0.5" Y="5.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAABAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>vaccine_system.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="fdo">
+    <Position X="4.75" Y="5.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>vaccine_system.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="doctor">
+    <Position X="7" Y="5.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>vaccine_system.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="gov_off">
+    <Position X="9.25" Y="5.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>vaccine_system.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="super_admin">
+    <Position X="2.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIIAQQAhCAABCAAAAAgIAAAEoQHAUAAAAFEAABECA=</HashCode>
+      <FileName>vaccine_system.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Filing">
+    <Position X="16.25" Y="2.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>ABBAgAJAAAABgAogDAAAAAABAUAIAAAAAAYCAAAIRFA=</HashCode>
+      <FileName>vaccine_system.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
