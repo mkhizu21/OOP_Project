@@ -98,6 +98,32 @@ bool is_valid_cnic(string cnic)
     return regex_match(cnic, valid_cnic);
 }
 
+bool is_valid_blood_group(string bg)
+{
+    if(bg.size() == 2)
+    {
+         if(bg[0] == 'A' || bg[0] == 'B' || bg[0] == 'O')
+         {
+            if(bg[1] == '+' || bg[1] == '-')
+            {
+                return true;
+            }
+         }
+    }
+    else if(bg.size() == 3)
+    {
+        if(bg[0] == 'AB')
+         {
+            if(bg[2] == '+' || bg[2] == '-')
+            {
+                return true;
+            }
+         }
+    }
+
+    return false;
+}
+
 class username_exists : public exception
 {
 
@@ -352,7 +378,7 @@ public:
     }
     
 
-    virtual void input_login_details() = 0; // inout username and password
+    virtual void input_login_details() = 0; // input username and password
 };
 
 class vaccines
@@ -466,7 +492,7 @@ public:
     }
     void companyoutput() //review company details
     {
-        cout << "Company Name: " << companyName;
+        cout << "Company Name: " << companyName << endl;
         vac->vaccineOutput();
     }
     
@@ -775,6 +801,80 @@ fdo* super_admin::fdo_list = nullptr;
 doctor* super_admin::doctor_list = nullptr;
 gov_off* super_admin::gov_off_list = nullptr;
 
+
+
+class citizen : public person
+{
+private:
+    int age;
+    string bloodType, city, is_eligible;
+public:
+    citizen()
+    {
+        is_eligible = "true";
+    }
+
+    void citizen_input()
+    {
+        input();
+
+        cout << "Enter age: ";
+        do
+        {
+            cin >> age;
+            if (age <= 0)
+            {
+                print_error("\n[!] ERROR: The age entered in not valid.\n\n");
+                cout << "Enter again: ";
+            }
+        } while (age <= 0);
+        cin >> age;
+
+        if (age < 5)
+        {
+            is_eligible = "false";
+        }
+
+        cout << "Enter blood type: ";
+        do
+        {
+            cin >> bloodType;
+            if (!is_valid_blood_group(bloodType))
+            {
+                print_error("\n[!] ERROR: The blood group entered in not valid.\n\n");
+                cout << "Enter again: ";
+            }
+
+        } while (!is_valid_blood_group(bloodType));
+
+        cout << "Enter city: ";
+        cin >> city;
+    }
+
+    void citizen_output()
+    {
+        output();
+        cout << "Age: " << age << endl;
+        cout << "Blood Group: " << bloodType << endl;
+        cout << "City: " << city << endl;
+    }
+
+    string file_detail()
+    {
+        return person::file_details() + "," + to_string(age) + "," + bloodType +"," + city +"," + is_eligible + ",";
+    }
+
+    void load_citizen(string un, string fn, string ln, string em, string cn, string No, string Age, string bT, string City, string is_e)
+    {
+        load_person_data(un, fn, ln, em, cn, No);
+        age = stoi(Age);
+        bloodType = bT;
+        city = City;
+        is_eligible = is_e;
+    }
+
+
+};
 
  class Filing
  {
