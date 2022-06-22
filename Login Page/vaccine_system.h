@@ -18,8 +18,8 @@ regex valid_name ("[A-Za-z]+");
 regex upper_case ("[A-Z]+"); 
 regex lower_case ("[a-z]+"); 
 regex number{ "[0-9]+" }; 
-regex special_char("[@!?#$\\,.<>{}%^&]+");
 
+void heading(string msg);
 
 HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
 string FILE_PATH = "";
@@ -66,9 +66,9 @@ bool is_valid_password(string pass)
         conditions += 1;
     }
 
-    conditions += regex_search(pass, upper_case) + regex_search(pass, lower_case) + regex_search(pass, number) + regex_search(pass, special_char);
+    conditions += regex_search(pass, upper_case) + regex_search(pass, lower_case) + regex_search(pass, number);
 
-    if (conditions == 5)
+    if (conditions == 4)
     {
         return true;
     }
@@ -230,6 +230,7 @@ void print_error(string output)
 }
 
 
+
 class Filing;
 
 class person
@@ -330,9 +331,9 @@ public:
         }
     }
 
-    string file_details()
+    virtual string file_details()
     {
-        return  username + "," + firstname + "," + lastname + "," + email + "," + CNIC + "," + contactNumber + ",\n";
+        return  username + "," + firstname + "," + lastname + "," + email + "," + CNIC + "," + contactNumber + ",";
     }
 
     string file_logindetails()
@@ -340,7 +341,7 @@ public:
         return username + " " + pass + "\n";
     }
 
-    void load_data(string un, string fn, string ln, string em, string cn, string No)
+    void load_person_data(string un, string fn, string ln, string em, string cn, string No)
     {
         username = un;
         firstname = fn;
@@ -357,8 +358,9 @@ public:
 class vaccines
 {
 private:
-    string vaccineName;
     string vaccineID;
+    string vaccineName;
+    int quantity;
     int Nofdoses;
     int price;
     int batchNo;
@@ -372,25 +374,47 @@ public:
         cin >> vaccineName;
         cout << "Enter no of doses: ";
         cin >> Nofdoses;
-        cout << "Enter the price of vaccine";
+        cout << "Enter the price of vaccine: ";
         cin >> price;
+        cout << "Enter the quantity of vaccine: ";
+        cin >> quantity;
     }
-    void vaccineOutput()
+    void vaccineOutput(bool bNO = false) // bNO tells wheter to print BatchNo or not
     {
         cout << "Vaccine ID: " << vaccineID << endl;
         cout << "Vaccine Name: " << vaccineName << endl;
         cout << "No. of doses: " << Nofdoses << endl;
-        cout << "Price of vaccine"<< price << endl;
+        cout << "Price of vaccine: "<< price << endl;
+        cout << "Quantity of vaccine: " << quantity << endl;
+        if(bNO)
+        cout << "BatchID: " << batchNo << endl;
     }
 
     string file_details()
     {
-        return vaccineID + "," + vaccineName + "," + to_string(Nofdoses) + "," + to_string(price) + "," + to_string(batchNo) + ",\n";
+        return vaccineID + "," + to_string(batchNo) + "," + vaccineName + "," + to_string(Nofdoses) + "," + to_string(price) + "," + to_string(quantity) + ",\n";
     }
-
+    void load_data(string vID, string vName, string NoDoses, string p, string q)
+    {
+        vaccineID = vID;
+        vaccineName = vName;
+        Nofdoses = stoi(NoDoses);
+        price = stoi(p);
+        quantity = stoi(q);
+    }
     void set_batchNo(int num)
     {
         batchNo = num;
+    }
+
+    void set_quantity(int q)
+    {
+        quantity = q;
+    }
+
+    int get_batchNo()
+    {
+        return batchNo;
     }
 
     string get_vacName()
@@ -400,7 +424,7 @@ public:
 
     string get_vacID()
     {
-        return vaccineName;
+        return vaccineID;
     }
 
     int get_Nofdoses()
@@ -411,6 +435,12 @@ public:
     {
         return price;
     }
+    
+    int get_quantity()
+    {
+        return quantity;
+    }
+
 };
 
 class company
@@ -418,14 +448,20 @@ class company
 private:
     string companyName;
     vaccines* vac;
+    int lastBatchNo;
 
     //taken from file
 public:
-
+    company()
+    {
+        vac = new vaccines;
+        lastBatchNo = 0;
+    }
     void companyInput() //admin can add companies
     {
         cout << "Enter company name: ";
         cin >> companyName;
+        
         vac->vaccineInput();
     }
     void companyoutput() //review company details
@@ -433,10 +469,19 @@ public:
         cout << "Company Name: " << companyName;
         vac->vaccineOutput();
     }
+    
+    vaccines* get_vac()
+    {
+        return vac;
+    }
+    int get_vac_quantity()
+    {
+        return vac->get_quantity();
+    }
 
     string file_details()
     {
-        return companyName + "," + vac->get_vacID() + "," + vac->get_vacName() + "," + to_string(vac->get_Nofdoses()) + "," + to_string(vac->get_price()) + ",\n" ;
+        return companyName + "," + to_string(lastBatchNo) +"," + vac->get_vacID() + "," + vac->get_vacName() + "," + to_string(vac->get_Nofdoses()) + "," + to_string(vac->get_price()) + "," + to_string(vac->get_quantity()) + ",\n" ;
     }
 
     bool compare_companyName(string n)
@@ -444,21 +489,41 @@ public:
         return n == companyName;
     }
 
+    void load_data(string cname, string LbNo, string vID, string vName, string NoDoses, string price, string quantity)
+    {
+        companyName = cname;
+        lastBatchNo = stoi(LbNo);
+        vac->load_data(vID, vName, NoDoses, price, quantity);
+    }
+
+    int get_batchID()
+    {
+        lastBatchNo++;
+        return lastBatchNo;
+    }
+
     //friend void getvaccine(int buyvaccine, company comp, warehouse ware);
 };
+
+
 
 class warehouse
 {
 private:
     vaccines* vac_ware;
     string houseID; //to specify a warehouse
-    int limit;
+    int limit, total_vac_amount;
     int vaccineCount;//count type of vaccines in this warehouse
     //location class will have composition here
+
 public:
+    bool is_enough_space(int x)
+    {
+        return (limit - total_vac_amount) >= x;
+    }
     warehouse()
     {
-        vaccineCount = 0;
+        total_vac_amount = vaccineCount = 0;
     }
 
     void houseInput()
@@ -468,29 +533,67 @@ public:
         cout << "Enter Storage capacity: ";
         cin >> limit;
 
-        vaccineCount = 0;
     }
-    void newvaccine()
+
+    void houseOutput()
     {
-        vac_ware = new vaccines[vaccineCount + 1];
+        cout << "Warehouse ID: " << houseID << endl;
+        cout << "Current Vaccine amount: " << total_vac_amount << endl;
+        cout << "Storage limit: " << limit << endl;
+        cout << "No of batches available: " << vaccineCount << endl;
+    }
+
+    void vaccinesOutput()
+    {
+        for (int i = 0; i < vaccineCount; i++)
+        {
+            cout << "\n";
+            vac_ware[i].vaccineOutput(true);
+        }
+    }
+
+     void load_vaccine(string vID, string lbatch, string vName, string NoDoses, string price, string quantity)
+    {
+       expand<vaccines>(vac_ware, vaccineCount);
+
+       vac_ware[vaccineCount-1].load_data(vID, vName, NoDoses, price, quantity);
+       vac_ware[vaccineCount-1].set_batchNo(stoi(lbatch));
+    }
+
+    void add_new_vaccine(vaccines *v, int lbatch)
+    {
+        string vID  = v->get_vacID();
+        string vName  = v->get_vacName();
+        string NoDoses  = to_string(v->get_Nofdoses());
+        string price = to_string(v->get_price());
+        string quantity = to_string(v->get_quantity());
+
+       expand<vaccines>(vac_ware, vaccineCount);
+
+       vac_ware[vaccineCount-1].load_data(vID, vName, NoDoses, price, quantity);
+       vac_ware[vaccineCount-1].set_batchNo(lbatch);
+
+       total_vac_amount += v->get_quantity();
     }
 
     string file_details()
     {
-        return houseID + "," + to_string(limit) + "," + to_string(vaccineCount) + ",\n";
+        return houseID + "," + to_string(limit) + "," + to_string(total_vac_amount) + "," + to_string(vaccineCount) + ",\n";
     }
 
-    void storingvaccines(int storevac)
+    void load_data(string id, string l, string vac_amt, string vacC)
     {
-        if (storevac < limit)
-        {
-            limit -= storevac;
-        }
-        else
-        {
-            cout << "not enough storage";
-        }
+        houseID = id; 
+        limit = stoi(l); 
+        total_vac_amount = stoi(vac_amt);
+        vaccineCount = stoi(vacC);
     }
+
+    bool compare_warehouseID(string n)
+    {
+        return n == houseID;
+    }
+
     //friend void getvaccine(int buyvaccine, company comp, warehouse ware);
 };
 //void getvaccine(int buyvaccine, company comp, warehouse ware)
@@ -518,13 +621,13 @@ private:
 class admin : public person
 {
 private:
-    int companies_count, warehouse_count, vacCen_count;
+    static int companies_count, warehouse_count, vacCen_count;
+    static int totalPrice;
+    static company* companies_list;
+    static warehouse* warehouses_list;
+    static vaccinationCenter* vacCen_list;
 
-    company* companies_list;
-    warehouse* warehouses_list;
-    vaccinationCenter* vacCen_list;
-
-    int find_company_index(string n)
+    static int find_company_index(string n)
     {
         for (int i = 0; i < companies_count; i++)
         {
@@ -537,16 +640,48 @@ private:
         return -1;
     }
 
+    static int find_warehouse_index(string n)
+    {
+        for (int i = 0; i < warehouse_count; i++)
+        {
+            if (warehouses_list[i].compare_warehouseID(n))
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
 public:
 
-    admin(): person(){}
+    admin();
     admin(string un, string fn, string ln, string em, string cn, string No);
     
+    void adminOutput();
+
     void add_company();
     void delete_company();
-    
+    void display_company();
+
+    void add_warehouse();
+    void display_warehouse();
+
+    string file_details();
+
+    void purchase_vaccine();
+    void load_admin_data(string un, string fn, string ln, string em, string cn, string No, string tprice);
     void input_login_details();    
 };
+
+int admin::companies_count = 0;
+int admin::warehouse_count = 0;
+int admin::vacCen_count = 0;
+int admin::totalPrice = 0;
+
+company* admin::companies_list = nullptr;
+warehouse* admin::warehouses_list = nullptr;
+vaccinationCenter* admin::vacCen_list = nullptr;
 
 class fdo :public person 
 {
@@ -569,22 +704,22 @@ class super_admin : public person
 private:
     static super_admin* self_instance;
 
-    int admin_count, fdo_count, doctor_count, gov_off_count;
+    static int admin_count, fdo_count, doctor_count, gov_off_count;
 
-    admin* admin_list;
-    fdo* fdo_list;
-    doctor* doctor_list;
-    gov_off* gov_off_list;
+    static admin* admin_list;
+    static fdo* fdo_list;
+    static doctor* doctor_list;
+    static gov_off* gov_off_list;
 
     super_admin(string un, string fn, string ln, string em, string cn, string No);
 
-    int find_admin_index(string un);
+    static int find_admin_index(string un);
 
-    int find_fdo_index(string un);
+    static int find_fdo_index(string un);
 
-    int find_doctor_index(string un);
+    static int find_doctor_index(string un);
 
-    int find_gov_off_index(string un);
+    static int find_gov_off_index(string un);
 
 
 
@@ -592,9 +727,22 @@ public:
 
     static super_admin* getInstance(string un, string fn, string ln, string em, string cn, string No);
 
+    static admin* admin_obj(string un)
+    {
+        int i = find_admin_index(un);
+        if (i != -1)
+        {
+            return &admin_list[i];
+        }
+
+    }
+
     void create_admin();
     void delete_admin();
     void update_admin();
+    void display_admin();
+
+    static void store_admins();
 
     void create_doctor();
     void delete_doctor();
@@ -617,6 +765,15 @@ public:
 
 };
 
+int super_admin::admin_count = 0;
+int super_admin::fdo_count = 0;
+int super_admin::doctor_count = 0;
+int super_admin::gov_off_count = 0;
+
+admin* super_admin::admin_list = nullptr;
+fdo* super_admin::fdo_list = nullptr;
+doctor* super_admin::doctor_list = nullptr;
+gov_off* super_admin::gov_off_list = nullptr;
 
 
  class Filing
@@ -736,10 +893,10 @@ public:
          ifstream details_file(FILE_PATH + "admin_details.csv");
          int count = 0;
          string line, word;
-         string details[6];
-         //string o_username, fn, ln, em, cn, No;
-         getline(details_file, line);
-         while (!details_file.eof())
+         string details[7];
+         //string o_username, fn, ln, em, cn, No, tprice;
+         
+         while (getline(details_file, line))
          {
              count = 0;
              stringstream str(line);
@@ -748,11 +905,11 @@ public:
              {
                  details[count++] = word;
              }
-
+             cout << details[0] << endl;
+             cout << admin_count << endl;
              expand<admin>(admin_list, admin_count);
-
-             admin_list[admin_count-1].load_data(details[0], details[1], details[2], details[3], details[4], details[5]);
-             getline(details_file, line);
+             
+             admin_list[admin_count-1].load_admin_data(details[0], details[1], details[2], details[3], details[4], details[5], details[6]);
          }
          
      }
@@ -1357,6 +1514,30 @@ public:
          login_output_file.close();
      }
 
+     static void initiate_all_companies(company*& companies_list, int& companies_count)
+     {
+         ifstream details_file(FILE_PATH + "company_details.csv");
+         int count = 0;
+         string line, word;
+         string details[7];
+         //string cname LbNo vID vName NoDoses price, quantity;
+
+         while (getline(details_file, line))
+         {
+             count = 0;
+             stringstream str(line);
+
+             while (getline(str, word, ','))
+             {
+                 details[count++] = word;
+             }
+
+             expand<company>(companies_list, companies_count);
+
+             companies_list[companies_count - 1].load_data(details[0], details[1], details[2], details[3], details[4], details[5], details[6]);
+         }
+
+     }
      static void add_new_company(company* obj)
      {
          ofstream details_file(FILE_PATH + "company_details.csv", ios::app);
@@ -1372,7 +1553,7 @@ public:
              details_file.close();
          }
      }
-     static void store_deleted_companies(company* arr, int size)
+     static void store_companies(company* arr, int size)
      {
          ofstream details_file(FILE_PATH + "company_details.csv");
 
@@ -1391,9 +1572,51 @@ public:
          }
      }
 
+     static void initiate_all_warehouses(warehouse*& warehouses_list, int& warehouse_count)
+     {
+         ifstream details_file(FILE_PATH + "warehouse_details.csv");
+         int count = 0;
+         string line, word;
+         string w_details[4], v_details[6];
+         //string houseID limit total_vac_amount vaccineCount
+
+         cout << "ware\n";
+         while (getline(details_file, line))
+         {
+             cout << "warehouse\n";
+             count = 0;
+             stringstream str(line);
+
+             while (getline(str, word, ','))
+             {
+                 cout << word << endl;
+                 w_details[count++] = word;
+             }
+
+             expand<warehouse>(warehouses_list, warehouse_count);
+
+             warehouses_list[warehouse_count - 1].load_data(w_details[0], w_details[1], w_details[2], "0");
+         
+         
+             for (int i = 0; i < stoi(w_details[3]); i++)
+             {
+                 count = 0;
+                 getline(details_file, line);
+                 stringstream str1(line);
+
+                 while (getline(str1, word, ','))
+                 {
+                     v_details[count++] = word;
+                 }
+
+                 warehouses_list[warehouse_count - 1].load_vaccine(v_details[0], v_details[1], v_details[2], v_details[3], v_details[4], v_details[5]);
+             }
+         }
+
+     }
      static void add_new_warehouse(warehouse* obj)
      {
-         ofstream details_file(FILE_PATH + "warhouse_details.csv", ios::app);
+         ofstream details_file(FILE_PATH + "warehouse_details.csv", ios::app);
 
          if (!details_file)
          {
@@ -1406,13 +1629,13 @@ public:
              details_file.close();
          }
      }
-     static void add_new_warehouse_vaccine(string ID, vaccines* obj)
+     static void add_new_warehouse_vaccine(string ID,warehouse* wareobj, vaccines* obj)
      {
-         ifstream details_file(FILE_PATH + "warhouse_details.csv");
+         ifstream details_file(FILE_PATH + "warehouse_details.csv");
          ofstream temp(FILE_PATH + "temp.csv");
 
          string line;
-         string warehouseID, limit, vacCount;
+         string warehouseID, limit, vacamt, vacCount;
 
          if (!details_file)
          {
@@ -1426,21 +1649,114 @@ public:
                  stringstream str(line);
                  getline(str, warehouseID, ',');
                  getline(str, limit, ',');
+                 getline(str, vacamt, ',');
                  getline(str, vacCount, ',');
 
-                 temp << line;
+                 if (warehouseID != ID)
+                 {
+                    temp << line;
+                    
+                    if (line.size() != 0)
+                    if (line[line.size() - 1] != '\n')
+                        temp << "\n";
+                    
+                 }
+                 else
+                 {
+                     temp << wareobj->file_details();
+                 }
 
                  for (int i = 0; i < stoi(vacCount); i++)
                  {
                      getline(details_file, line);
                      temp << line;
+                     
+                     if(line.size() != 0)
+                     if (line[line.size() - 1] != '\n')
+                         temp << "\n";
                  }
 
                  if (warehouseID == ID)
                  {
+
                      temp << obj->file_details();
                  }
                  
+             }
+
+             details_file.close();
+             temp.close();
+
+             ofstream details_file("warehouse_details.csv");
+             ifstream temp("temp.csv");
+
+             while (getline(temp, line))
+             {
+                 details_file << line;
+
+                 if (line.size() != 0)
+                 if (line[line.size() - 1] != '\n')
+                 {
+                     details_file << "\n"; //Pakistani tughe salaam :))
+                 }
+             }
+
+             details_file.close();
+             temp.close();
+         }
+     }
+
+     static void delete_warehouse_vaccine(string ID, string vID, string bID)
+     {
+         ifstream details_file(FILE_PATH + "warhouse_details.csv");
+         ofstream temp(FILE_PATH + "temp.csv");
+
+         string line;
+         string warehouseID, limit, vacCount;
+         string vacID, batchID;
+
+         if (!details_file)
+         {
+             //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
+         }
+         else
+         {
+
+             while (getline(details_file, line))
+             {
+                 stringstream str(line);
+                 getline(str, warehouseID, ',');
+                 getline(str, limit, ',');
+                 getline(str, vacCount, ',');
+
+                 temp << line;
+
+                 if (warehouseID == ID)
+                 {
+                     for (int i = 0; i < stoi(vacCount); i++)
+                     {
+                         getline(details_file, line);
+
+                         stringstream str1(line);
+                         getline(str, vacID, ',');
+                         getline(str, batchID, ',');
+
+                         if (vID != vacID && bID != batchID)
+                         {
+                             temp << line;
+                         }
+
+                     }
+                 }
+                 else
+                 {
+                     for (int i = 0; i < stoi(vacCount); i++)
+                     {
+                         getline(details_file, line);
+                         temp << line;
+                     }
+                 }
+
              }
 
              details_file.close();
@@ -1472,10 +1788,7 @@ public:
      {
          // read admin, fdo, doctor, government officials from file
         admin_count = fdo_count = doctor_count = gov_off_count = 0;
-        admin_list = nullptr;
-        fdo_list = nullptr;
-        doctor_list = nullptr;
-        gov_off_list = nullptr;
+        
         
         Filing::initiate_all_admin(admin_list, admin_count);
      }
@@ -1598,6 +1911,20 @@ public:
              print_error("\n\n[!]ERROR: There is no admin to update.\n\n");
          }
 
+     }
+     void super_admin::display_admin()
+     {
+         cout << "\n\n------------------------ADMINS------------------------\n\n";
+         for (int i = 0; i < admin_count; i++)
+         {
+             admin_list[i].adminOutput();
+             cout << "\n";
+         }
+     }
+     
+     void super_admin::store_admins()
+     {
+         Filing::store_updated_admins("", admin_list, admin_count);
      }
 
      void super_admin::create_doctor()
@@ -1797,6 +2124,24 @@ public:
 
     
 //------------------------ ADMIN DEFINATIONS------------------------------------------------------------------
+    
+    admin::admin()
+    {
+        if (companies_list == nullptr && warehouses_list == nullptr && vacCen_list == nullptr)
+        {
+            cout << "ADMIN CONSTRUCTOR" << endl;
+            companies_count = warehouse_count = vacCen_count = 0;
+            Filing::initiate_all_companies(companies_list, companies_count);
+            Filing::initiate_all_warehouses(warehouses_list, warehouse_count);
+        }
+
+    }
+
+    void admin::adminOutput()
+    {
+        output();
+        cout << "Total amount spent: $" << totalPrice << endl;
+    }
     admin::admin(string un, string fn, string ln, string em, string cn, string No) : person(un, fn, ln, em, cn, No)
      {
 
@@ -1876,7 +2221,7 @@ public:
             {
                 del<company>(companies_list, companies_count, i);
                 companies_count--;
-                Filing::store_deleted_companies(companies_list, companies_count);
+                Filing::store_companies(companies_list, companies_count);
             }
             else
             {
@@ -1887,6 +2232,134 @@ public:
         {
             print_error("\n\n[!]ERROR: There is no company to delete.\n\n");
         }
+    }
+
+    void admin::display_company()
+    {
+
+        for (int i = 0; i < companies_count; i++)
+        {
+            cout << "\n";
+            companies_list[i].companyoutput();
+        }
+    }
+
+    void admin::add_warehouse()
+    {
+        expand<warehouse>(warehouses_list, warehouse_count);
+
+        warehouses_list[warehouse_count - 1].houseInput();
+
+        Filing::add_new_warehouse(&warehouses_list[warehouse_count - 1]);
+    }
+
+    void admin::display_warehouse()
+    {
+        
+        for (int i = 0; i < warehouse_count; i++)
+        {
+            
+            cout << "\n";
+            warehouses_list[i].houseOutput();
+            
+        }
+    }
+
+    void admin::purchase_vaccine()
+    {
+        vaccines* vac;
+        string company_name, wareID;
+        int index, vaccineamt, bID;
+        bool warehouse_available = false, correct_input = false;
+
+        heading("COMPANIES");
+        display_company();
+
+        cout << "\n\nEnter the name of company you want to buy from: ";
+        do
+        {
+            cin >> company_name;
+            if (find_company_index(company_name) == -1)
+            {
+                print_error("\n[!] ERROR: The company name entered doesn't exist.\n");
+                cout << "Enter again: ";
+            }
+        } while (find_company_index(company_name) == -1);
+
+        index = find_company_index(company_name);
+        vaccineamt = companies_list[index].get_vac_quantity();
+
+        cout << "\n--------------------WAREHOUSES--------------------\n\n";
+        for (int i = 0; i < warehouse_count; i++)
+        {
+            if (warehouses_list[i].is_enough_space(vaccineamt))
+            {
+                warehouse_available = true;
+                warehouses_list[i].houseOutput();
+                cout << "\n";
+            }
+        }
+        if (warehouse_available)
+        {
+            cout << "\n\nEnter the ID of warehouse: ";
+            do
+            {
+                cin >> wareID;
+                if (find_warehouse_index(wareID) == -1)
+                {
+                    print_error("\n[!] ERROR: The warehouse entered doesn't exist.\n");
+                    cout << "Enter again: ";
+                }
+                else
+                {
+                    vaccineamt = companies_list[find_warehouse_index(wareID)].get_vac_quantity();
+                    if (!warehouses_list[find_warehouse_index(wareID)].is_enough_space(vaccineamt))
+                    {
+                        print_error("\n[!] ERROR: The warehouse entered doesn't exist.\n");
+                        cout << "Enter again: ";
+                    }
+                    else
+                    {
+                        correct_input = true;
+                    }
+                }
+                
+            } while (!correct_input);
+
+            int wareI = find_warehouse_index(wareID);
+            cout << wareI << endl;
+
+            vac = companies_list[index].get_vac();
+            bID = companies_list[index].get_batchID();
+
+            Filing::store_companies(companies_list, companies_count);
+
+            vac->set_batchNo(bID);
+
+            warehouses_list[wareI].add_new_vaccine(vac, bID);
+
+            totalPrice += vac->get_price();
+
+            Filing::add_new_warehouse_vaccine(wareID, &warehouses_list[wareI], vac);
+
+            super_admin::store_admins();
+        }
+        else
+        {
+            print_error("\n[!] ERROR: No warehouse has enough space.\n");
+        }
+
+    }
+
+    string admin::file_details()
+    {
+        return person::file_details() + to_string(totalPrice) + ",\n";
+    }
+
+    void admin::load_admin_data(string un, string fn, string ln, string em, string cn, string No, string tprice)
+    {
+        load_person_data(un, fn, ln, em, cn, No);
+        totalPrice = stoi(tprice);
     }
 //----------------------------------------------------------------------------------------------------------------
 
