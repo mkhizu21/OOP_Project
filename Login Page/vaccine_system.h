@@ -155,6 +155,12 @@ class wrong_password;
 class unregistered_username;
 //-------------------------------------------------------------
 
+void print_error(string output)
+{
+    SetConsoleTextAttribute(h, 252);
+    cout << output;
+    SetConsoleTextAttribute(h, 240);
+}
 
 template<typename T>
 void expand(T*& ptr, int& size)
@@ -209,6 +215,39 @@ void del(T*& ptr, int size, int index)
     }
 }
 
+template <typename T>
+T safe_input()
+{
+    T temp;
+    bool is_input = false;
+
+    while (!is_input)
+    {
+        try
+        {
+            cin >> temp;
+
+            if (!cin)
+                throw 0;
+
+            is_input = true;
+
+
+        }
+        catch (...)
+        {
+
+            cin.clear(); //clear bad input flag
+            //cin.ignore(std::numeric_limits<streamsize>::max(), '\n'); //discard input
+
+            print_error("\n[!] Invalid Input !!\n");
+            cout << "\nEnter again: ";
+        }
+    }
+
+    return temp;
+}
+
 string encrypt(string username, string pass)
 {
     int key = 0;
@@ -248,12 +287,7 @@ void print_spaces(int space = 38)
     cout << "\n" << setfill(' ') << setw(space) << "";
 }
 
-void print_error(string output)
-{
-    SetConsoleTextAttribute(h, 252);
-    cout << output;
-    SetConsoleTextAttribute(h, 240);
-}
+
 
 
 
@@ -377,7 +411,7 @@ public:
         contactNumber = No;
     }
     
-
+    
     virtual void input_login_details() = 0; // input username and password
 };
 
@@ -578,12 +612,17 @@ public:
         }
     }
 
-     void load_vaccine(string vID, string lbatch, string vName, string NoDoses, string price, string quantity)
+    void load_vaccine(string vID, string lbatch, string vName, string NoDoses, string price, string quantity)
     {
-       expand<vaccines>(vac_ware, vaccineCount);
+        expand<vaccines>(vac_ware, vaccineCount);
 
-       vac_ware[vaccineCount-1].load_data(vID, vName, NoDoses, price, quantity);
-       vac_ware[vaccineCount-1].set_batchNo(stoi(lbatch));
+        vac_ware[vaccineCount-1].load_data(vID, vName, NoDoses, price, quantity);
+        vac_ware[vaccineCount-1].set_batchNo(stoi(lbatch));
+    }
+
+    vaccines* get_vaccine(int i)
+    {
+        return &vac_ware[i];
     }
 
     void add_new_vaccine(vaccines *v, int lbatch)
@@ -602,6 +641,9 @@ public:
        total_vac_amount += v->get_quantity();
     }
 
+    void remove_vaccine(string vacID, int batchID);
+
+
     string file_details()
     {
         return houseID + "," + to_string(limit) + "," + to_string(total_vac_amount) + "," + to_string(vaccineCount) + ",\n";
@@ -618,6 +660,19 @@ public:
     bool compare_warehouseID(string n)
     {
         return n == houseID;
+    }
+
+    int find_valid_vacID_batchID(string vID, int bID)
+    {
+        for (int i = 0; i < vaccineCount; i++)
+        {
+            if (vID == vac_ware[i].get_vacID() && bID == vac_ware[i].get_batchNo())
+            {
+                return i;
+            }
+        }
+
+        return -1;
     }
 
     //friend void getvaccine(int buyvaccine, company comp, warehouse ware);
@@ -638,46 +693,78 @@ public:
 //	}
 //}
 
-class vaccinationCenter
+class doctor :public person
 {
-private:
+public:
+    doctor()
+    {
+        username = "doctor";
+    }
+    bool is_health_ok()
+    {
+        int bloodPressure, OxyLvl, GlucoseLvl;
+
+        cout << "Enter Blood Pressure: ";
+        bloodPressure = safe_input<int>();
+        cout << "Enter Oxygen Level: ";
+        OxyLvl = safe_input<int>();
+        cout << "Enter GlucoseLvl: ";
+        GlucoseLvl = safe_input<int>();
+
+        if (bloodPressure <= 120 && OxyLvl >= 95 && GlucoseLvl >= 70 && GlucoseLvl <= 100)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    void input_login_details() {}
+};
+
+class fdo :public person 
+{
+    string vacCenterName, city;
+    int vacCount;
+    vaccines* vac_list;
+    doctor* doc;
+
+public:
+    fdo();
+    
+    void fdo_input();
+    void fdo_output();
+
+    string file_details();
+
+    void load_data(string un, string fn, string ln, string em, string cn, string No, string vCenName, string City, string vCount, string un1, string fn1, string ln1, string em1, string cn1, string No1);
+
+    void load_vaccine(string vID, string lbatch, string vName, string NoDoses, string price, string quantity);
+
+    void add_new_vaccine(vaccines* v);
+    void output_vaccines();
+    void get_vaccine();
+    void vacinate_citizen();
+
+    bool compare_city(string c);
+
+    void input_login_details();
 
 };
+
+
 
 class admin : public person
 {
 private:
-    static int companies_count, warehouse_count, vacCen_count;
+    static int companies_count, warehouse_count, fdo_count;
     static int totalPrice;
     static company* companies_list;
     static warehouse* warehouses_list;
-    static vaccinationCenter* vacCen_list;
+    static fdo* fdo_list;
 
-    static int find_company_index(string n)
-    {
-        for (int i = 0; i < companies_count; i++)
-        {
-            if (companies_list[i].compare_companyName(n))
-            {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-    static int find_warehouse_index(string n)
-    {
-        for (int i = 0; i < warehouse_count; i++)
-        {
-            if (warehouses_list[i].compare_warehouseID(n))
-            {
-                return i;
-            }
-        }
-
-        return -1;
-    }
 
 public:
 
@@ -691,34 +778,71 @@ public:
     void display_company();
 
     void add_warehouse();
-    void display_warehouse();
+    static void display_warehouse();
 
     string file_details();
 
     void purchase_vaccine();
     void load_admin_data(string un, string fn, string ln, string em, string cn, string No, string tprice);
     void input_login_details();    
+
+    static warehouse* get_warehouse(int i)
+    {
+        return &warehouses_list[i];
+    }
+
+    static int find_company_index(string n)
+    {
+        for (int i = 0; i < companies_count; i++)
+        {
+            if (companies_list[i].compare_companyName(n))
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+    static int find_warehouse_index(string n)
+    {
+        for (int i = 0; i < warehouse_count; i++)
+        {
+            if (warehouses_list[i].compare_warehouseID(n))
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    static bool does_vac_center_exists_in(string c)
+    {
+        for (int i = 0; i < fdo_count; i++)
+        {
+            if (fdo_list[i].compare_city(c))
+            {
+                return true;
+            }
+
+        }
+
+        return false;
+
+    }
 };
 
 int admin::companies_count = 0;
 int admin::warehouse_count = 0;
-int admin::vacCen_count = 0;
+int admin::fdo_count = 0;
 int admin::totalPrice = 0;
 
 company* admin::companies_list = nullptr;
 warehouse* admin::warehouses_list = nullptr;
-vaccinationCenter* admin::vacCen_list = nullptr;
+fdo* admin::fdo_list = nullptr;
 
-class fdo :public person 
-{
-public:
-    void input_login_details() {}
-};
-class doctor :public person 
-{
-public:
-    void input_login_details() {}
-};
+
+
 class gov_off :public person 
 {
 public:
@@ -762,6 +886,15 @@ public:
         }
 
     }
+    static fdo* fdo_obj(string un)
+    {
+        int i = find_fdo_index(un);
+        if (i != -1)
+        {
+            return &fdo_list[i];
+        }
+
+    }
 
     void create_admin();
     void delete_admin();
@@ -777,6 +910,7 @@ public:
     void create_fdo();
     void delete_fdo();
     void update_fdo();
+    void display_fdo();
 
     void create_gov_off();
     void delete_gov_off();
@@ -807,13 +941,29 @@ class citizen : public person
 {
 private:
     int age;
-    string bloodType, city, is_eligible;
+    string bloodType, city;
+    bool is_eligible;
 public:
     citizen()
     {
-        is_eligible = "true";
+        username = "NULL";
+        is_eligible = true;
     }
 
+    citizen(string un, string fn, string ln, string em, string cn, string No, string Age, string bT, string City)
+    {
+        
+        is_eligible = true;
+        load_person_data("NULL", fn, ln, em, cn, No);
+        age = stoi(Age);
+        bloodType = bT;
+        city = City;
+
+        if (age < 5)
+        {
+            is_eligible = false;
+        }
+    }
     void citizen_input()
     {
         input();
@@ -828,11 +978,10 @@ public:
                 cout << "Enter again: ";
             }
         } while (age <= 0);
-        cin >> age;
 
         if (age < 5)
         {
-            is_eligible = "false";
+            is_eligible = false;
         }
 
         cout << "Enter blood type: ";
@@ -859,21 +1008,30 @@ public:
         cout << "City: " << city << endl;
     }
 
-    string file_detail()
+    bool get_eligibity()
     {
-        return person::file_details() + "," + to_string(age) + "," + bloodType +"," + city +"," + is_eligible + ",";
+        return is_eligible;
     }
 
-    void load_citizen(string un, string fn, string ln, string em, string cn, string No, string Age, string bT, string City, string is_e)
+    string file_details()
+    {
+        return person::file_details() + to_string(age) + "," + bloodType +"," + city +",";
+    }
+
+    void load_citizen(string un, string fn, string ln, string em, string cn, string No, string Age, string bT, string City)
     {
         load_person_data(un, fn, ln, em, cn, No);
         age = stoi(Age);
         bloodType = bT;
         city = City;
-        is_eligible = is_e;
+
+        if (age < 5)
+        {
+            is_eligible = false;
+        }
     }
 
-
+    void input_login_details(){}
 };
 
  class Filing
@@ -1340,6 +1498,48 @@ public:
 
          return logined;
      }
+     static void initiate_all_fdo(fdo*& fdos_list, int& fdo_count)
+     {
+         ifstream details_file(FILE_PATH + "fdo_details.csv");
+         int count = 0;
+         string line, word;
+         string fdo_details[15], v_details[6];
+         //string houseID limit total_vac_amount vaccineCount
+
+         cout << "ware\n";
+         while (getline(details_file, line))
+         {
+             cout << "fdo\n";
+             count = 0;
+             stringstream str(line);
+
+             while (getline(str, word, ','))
+             {
+                 cout << word << endl;
+                 fdo_details[count++] = word;
+             }
+
+             expand<fdo>(fdos_list, fdo_count);
+
+             fdos_list[fdo_count - 1].load_data(fdo_details[0], fdo_details[1], fdo_details[2], fdo_details[3], fdo_details[4], fdo_details[5], fdo_details[6], fdo_details[7], "0", fdo_details[9], fdo_details[10], fdo_details[11], fdo_details[12], fdo_details[13], fdo_details[14]);
+
+
+             for (int i = 0; i < stoi(fdo_details[8]); i++)
+             {
+                 count = 0;
+                 getline(details_file, line);
+                 stringstream str1(line);
+
+                 while (getline(str1, word, ','))
+                 {
+                     v_details[count++] = word;
+                 }
+
+                 fdos_list[fdo_count - 1].load_vaccine(v_details[0], v_details[1], v_details[2], v_details[3], v_details[4], v_details[5]);
+             }
+         }
+
+     }
      static void add_new_fdo(fdo* obj)
      {
          ofstream details_file(FILE_PATH + "fdo_details.csv", ios::app);
@@ -1356,6 +1556,86 @@ public:
 
              details_file.close();
              login_file.close();
+         }
+     }
+     static void add_new_fdo_vaccine(string ID, fdo* fdoobj, vaccines* obj)
+     {
+         ifstream details_file(FILE_PATH + "fdo_details.csv");
+         ofstream temp(FILE_PATH + "temp.csv");
+
+         string line, word;
+
+         int count = 0;
+         string details[15];
+         //username firstname lastname email contactNumber CNIC vacCenterName, city vacCount doc_username firstname lastname email contactNumber CNIC
+
+         if (!details_file)
+         {
+             //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
+         }
+         else
+         {
+
+             while (getline(details_file, line))
+             {
+                 count = 0;
+                 stringstream str(line);
+                 while (getline(str, word, ','))
+                 {
+                     details[count++] = word;
+                 }
+
+                 if (details[0] != ID)
+                 {
+                     temp << line;
+
+                     if (line.size() != 0)
+                         if (line[line.size() - 1] != '\n')
+                             temp << "\n";
+
+                 }
+                 else
+                 {
+                     temp << fdoobj->file_details();
+                 }
+
+                 for (int i = 0; i < stoi(details[8]); i++)
+                 {
+                     getline(details_file, line);
+                     temp << line;
+
+                     if (line.size() != 0)
+                         if (line[line.size() - 1] != '\n')
+                             temp << "\n";
+                 }
+
+                 if (details[0] == ID)
+                 {
+
+                     temp << obj->file_details();
+                 }
+
+             }
+
+             details_file.close();
+             temp.close();
+
+             ofstream details_file("fdo_details.csv");
+             ifstream temp("temp.csv");
+
+             while (getline(temp, line))
+             {
+                 details_file << line;
+
+                 if (line.size() != 0)
+                     if (line[line.size() - 1] != '\n')
+                     {
+                         details_file << "\n"; //Pakistani tughe salaam :))
+                     }
+             }
+
+             details_file.close();
+             temp.close();
          }
      }
      static void store_deleted_fdos(string username, fdo* arr, int size)
@@ -1805,14 +2085,13 @@ public:
              temp.close();
          }
      }
-
-     static void delete_warehouse_vaccine(string ID, string vID, string bID)
+     static void delete_warehouse_vaccine(string ID, warehouse* obj, string vID, string bID)
      {
-         ifstream details_file(FILE_PATH + "warhouse_details.csv");
+         ifstream details_file(FILE_PATH + "warehouse_details.csv");
          ofstream temp(FILE_PATH + "temp.csv");
 
          string line;
-         string warehouseID, limit, vacCount;
+         string warehouseID, limit, vacamt, vacCount;
          string vacID, batchID;
 
          if (!details_file)
@@ -1827,33 +2106,48 @@ public:
                  stringstream str(line);
                  getline(str, warehouseID, ',');
                  getline(str, limit, ',');
+                 getline(str, vacamt, ',');
                  getline(str, vacCount, ',');
 
-                 temp << line;
+                 
 
                  if (warehouseID == ID)
                  {
+                     temp << obj->file_details();
                      for (int i = 0; i < stoi(vacCount); i++)
                      {
                          getline(details_file, line);
 
                          stringstream str1(line);
-                         getline(str, vacID, ',');
-                         getline(str, batchID, ',');
+                         getline(str1, vacID, ',');
+                         getline(str1, batchID, ',');
 
-                         if (vID != vacID && bID != batchID)
+                         if (vID != vacID || bID != batchID)
                          {
                              temp << line;
+
+                             if (line.size() != 0)
+                                 if (line[line.size() - 1] != '\n')
+                                     temp << "\n";
                          }
 
                      }
                  }
                  else
                  {
+                     temp << line;
+                     if (line.size() != 0)
+                         if (line[line.size() - 1] != '\n')
+                             temp << "\n";
+
                      for (int i = 0; i < stoi(vacCount); i++)
                      {
                          getline(details_file, line);
                          temp << line;
+
+                         if (line.size() != 0)
+                             if (line[line.size() - 1] != '\n')
+                                 temp << "\n";
                      }
                  }
 
@@ -1862,16 +2156,16 @@ public:
              details_file.close();
              temp.close();
 
-             ofstream details_file("warhouse_details.csv");
+             ofstream details_file("warehouse_details.csv");
              ifstream temp("temp.csv");
 
              while (getline(temp, line))
              {
                  details_file << line;
-                 if (line[line.size() - 1] != '\n')
-                 {
-                     details_file << "\n"; //Pakistani tughe salaam :))
-                 }
+
+                 if (line.size() != 0)
+                     if (line[line.size() - 1] != '\n')
+                         details_file << "\n";
              }
 
              details_file.close();
@@ -1879,6 +2173,105 @@ public:
          }
      }
 
+
+     static bool find_citizen(string CNIC)
+     {
+         ifstream details_file(FILE_PATH + "citizen_details.csv");
+
+         int count = 0;
+         string line, word;
+         string details[9];
+         //string un fn ln em cn No Age bT City
+
+         while (getline(details_file, line))
+         {
+             count = 0;
+             stringstream str(line);
+
+             while (getline(str, word, ','))
+             {
+                 details[count++] = word;
+             }
+
+             if (CNIC == details[4])
+             {
+                 return true;
+             }
+         }
+
+         return false;
+     }
+     static bool already_vacinated(string CNIC)
+     {
+         ifstream details_file(FILE_PATH + "citizen_vac.csv");
+         string line, word;
+         string c, vac, is_vac;
+         while (getline(details_file, line))
+         {
+             
+             stringstream str(line);
+             getline(str, c, ',');
+             getline(str, vac, ',');
+             getline(str, is_vac, ',');
+             
+
+             if (CNIC == c && is_vac == "yes")
+             {
+                 return true;
+             }
+         }
+
+         return false;
+     }
+     static void add_new_citizen(citizen* obj)
+     {
+         ofstream details_file(FILE_PATH + "citizen_details.csv", ios::app);
+
+         if (!details_file)
+         {
+             print_error("\n\nERROR IN OPENING THE FILE: citizen_details.csv\n\n");
+         }
+         else
+         {
+             details_file << obj->file_details();
+
+             details_file.close();
+         }
+     }
+     static citizen load_citizen(string CNIC)
+     {
+         ifstream details_file(FILE_PATH + "citizen_details.csv");
+
+         int count = 0;
+         string line, word;
+         string details[9];
+         //string un fn ln em cn No Age bT City
+
+         while (getline(details_file, line))
+         {
+             count = 0;
+             stringstream str(line);
+
+             while (getline(str, word, ','))
+             {
+                 details[count++] = word;
+             }
+
+             if (CNIC == details[4])
+             {
+                 return citizen(details[0], details[1], details[2], details[3], details[4], details[5], details[6], details[7], details[8]);
+             }
+         }
+
+     }
+     static void store_vac_citizen(string cnic, string vacID)
+     {
+         ofstream details_file(FILE_PATH + "citizen_vac.csv", ios::app);
+
+         details_file << cnic + "," + vacID + ",yes,\n";
+
+         details_file.close();
+     }
      
 
  };
@@ -1891,6 +2284,7 @@ public:
         
         
         Filing::initiate_all_admin(admin_list, admin_count);
+        Filing::initiate_all_fdo(fdo_list, fdo_count);
      }
      int super_admin::find_admin_index(string un)
      {
@@ -2014,7 +2408,7 @@ public:
      }
      void super_admin::display_admin()
      {
-         cout << "\n\n------------------------ADMINS------------------------\n\n";
+   
          for (int i = 0; i < admin_count; i++)
          {
              admin_list[i].adminOutput();
@@ -2096,7 +2490,7 @@ public:
          expand<fdo>(fdo_list, fdo_count);
 
          fdo_list[fdo_count - 1].input_login_details();
-         fdo_list[fdo_count - 1].input();
+         fdo_list[fdo_count - 1].fdo_input();
 
          Filing::add_new_fdo(&fdo_list[fdo_count - 1]);
      }
@@ -2151,6 +2545,14 @@ public:
              print_error("\n\n[!]ERROR: There is no fdo to update.\n\n");
          }
 
+     }
+     void super_admin::display_fdo()
+     {
+         for (int i = 0; i < fdo_count; i++)
+         {
+             fdo_list[i].fdo_output();
+             cout << "\n";
+         }
      }
 
      void super_admin::create_gov_off()
@@ -2227,10 +2629,10 @@ public:
     
     admin::admin()
     {
-        if (companies_list == nullptr && warehouses_list == nullptr && vacCen_list == nullptr)
+        if (companies_list == nullptr && warehouses_list == nullptr && fdo_list == nullptr)
         {
             cout << "ADMIN CONSTRUCTOR" << endl;
-            companies_count = warehouse_count = vacCen_count = 0;
+            companies_count = warehouse_count = fdo_count = 0;
             Filing::initiate_all_companies(companies_list, companies_count);
             Filing::initiate_all_warehouses(warehouses_list, warehouse_count);
         }
@@ -2389,7 +2791,7 @@ public:
         index = find_company_index(company_name);
         vaccineamt = companies_list[index].get_vac_quantity();
 
-        cout << "\n--------------------WAREHOUSES--------------------\n\n";
+        heading("WAREHOUSES");
         for (int i = 0; i < warehouse_count; i++)
         {
             if (warehouses_list[i].is_enough_space(vaccineamt))
@@ -2412,7 +2814,7 @@ public:
                 }
                 else
                 {
-                    vaccineamt = companies_list[find_warehouse_index(wareID)].get_vac_quantity();
+
                     if (!warehouses_list[find_warehouse_index(wareID)].is_enough_space(vaccineamt))
                     {
                         print_error("\n[!] ERROR: The warehouse entered doesn't exist.\n");
@@ -2463,8 +2865,282 @@ public:
     }
 //----------------------------------------------------------------------------------------------------------------
 
-     
+//------------------------ FDO DEFINATIONS------------------------------------------------------------------
+
+    fdo::fdo()
+    {
+        doc = new doctor;
+        vacCount = 0;
+    }
+
+    void fdo::fdo_input()
+    {
+        cout << "\n->FDO Details\n\n";
+        input();
+
+        cout << "\n\n->Vaccine Center Details\n\n";
+        cout << "Enter Name: ";
+        cin >> vacCenterName;
+        cout << "Enter City: ";
+        do
+        {
+            cin >> city;
+            if (admin::does_vac_center_exists_in(city))
+            {
+                print_error("\n[!] ERROR: The vaccine center already exists.\n");
+                cout << "Enter again: ";
+            }
+        } while (admin::does_vac_center_exists_in(city));
+
+        cout << "\n\n->Doctor Details\n\n";
+        doc->input();
+    }
+    void fdo::fdo_output()
+    {
+        cout << "\n->FDO Details\n\n";
+        output();
+
+        cout << "\n\n->Vaccine Center Details\n\n";
+        cout << "Enter Name: ";
+        cout << "Name: " << vacCenterName << endl;
+        cout << "City: " << city << endl;
+
+        cout << "\n\n->Doctor Details\n\n";
+        doc->output();
+    }
+    string fdo::file_details()
+    {
+        return person::file_details() + vacCenterName + "," + city + "," + to_string(vacCount)+ "," + doc->file_details() + "\n";
+    }
+
+    void fdo::load_data(string un, string fn, string ln, string em, string cn, string No, string vCenName, string City, string vCount, string un1, string fn1, string ln1, string em1, string cn1, string No1)
+    {
+        load_person_data(un, fn, ln, em, cn, No);
+        vacCenterName = vCenName;
+        city = City;
+        vacCount = stoi(vCount);
+        doc->load_person_data(un1, fn1, ln1, em1, cn1, No1);
+    }
+
+    void fdo::load_vaccine(string vID, string lbatch, string vName, string NoDoses, string price, string quantity)
+    {
+        expand<vaccines>(vac_list, vacCount);
+
+        vac_list[vacCount - 1].load_data(vID, vName, NoDoses, price, quantity);
+        vac_list[vacCount - 1].set_batchNo(stoi(lbatch));
+    }
+
+    void fdo::add_new_vaccine(vaccines* v)
+    {
+        string vID = v->get_vacID();
+        string vName = v->get_vacName();
+        string NoDoses = to_string(v->get_Nofdoses());
+        string price = to_string(v->get_price());
+        string quantity = to_string(v->get_quantity());
+        int lbatch = v->get_batchNo();
+
+        expand<vaccines>(vac_list, vacCount);
+
+        vac_list[vacCount - 1].load_data(vID, vName, NoDoses, price, quantity);
+        vac_list[vacCount - 1].set_batchNo(lbatch);
+    }
+    void fdo::output_vaccines()
+    {
+        for (int i = 0; i < vacCount; i++)
+        {
+            cout << i + 1 << ".\n";
+            vac_list[i].vaccineOutput();
+            cout << "\n";
+        }
+    }
+    //menu option
+    void fdo::get_vaccine()
+    {
+        string wareID;
+
+        string vacID;
+        int batchID, vacIndex;
+
+        heading("WAREHOUSES");
+        admin::display_warehouse();
+
+        cout << "\n\nEnter the ID of warehouse: ";
+        do
+        {
+            cin >> wareID;
+            if (admin::find_warehouse_index(wareID) == -1)
+            {
+                print_error("\n[!] ERROR: The warehouse entered doesn't exist.\n");
+                cout << "Enter again: ";
+            }
 
 
+        } while (admin::find_warehouse_index(wareID) == -1);
+
+        warehouse* warePtr = admin::get_warehouse(admin::find_warehouse_index(wareID));
+
+        heading("VACCINES");
+        warePtr->vaccinesOutput();
 
 
+        do
+        {
+            cout << "\n\nEnter the vaccine ID: ";
+            cin >> vacID;
+            cout << "Enter the batch ID: ";
+            batchID = safe_input<int>();
+
+            if (warePtr->find_valid_vacID_batchID(vacID, batchID) == -1)
+            {
+                print_error("\n[!] ERROR: The vacID/batchID entered doesn't exist.\n");
+            }
+
+
+        } while (warePtr->find_valid_vacID_batchID(vacID, batchID) == -1);
+
+        vacIndex = warePtr->find_valid_vacID_batchID(vacID, batchID);
+
+        vaccines* vacPtr = warePtr->get_vaccine(vacIndex);
+
+        add_new_vaccine(vacPtr);
+
+        Filing::add_new_fdo_vaccine(username, this, vacPtr);
+
+        warePtr->remove_vaccine(vacID, batchID);
+
+        cout << "\n\n[$]: The vaccine has been transfered successfully." << endl;
+    } //
+
+    void fdo::vacinate_citizen()
+    {
+        int i;
+        string cnic;
+        cout << "Enter your CNIC: ";
+        do
+        {
+            cin >> cnic;
+            if (!is_valid_cnic(cnic))
+            {
+                print_error("\n[!] ERROR: The CNIC entered in not valid.\n\n");
+                cout << "Enter again: ";
+            }
+        } while (!is_valid_cnic(cnic));
+
+        if (Filing::find_citizen(cnic))
+        {
+            if (!Filing::already_vacinated(cnic))
+            {
+                citizen ctz = Filing::load_citizen(cnic);
+
+                if (ctz.get_eligibity())
+                {
+                    cout << "\n\n->CITIZEN INFO\n\n";
+                    ctz.citizen_output();
+
+
+                    cout << "\n\nYou are eligible for the vaccine.\n\n";
+                    cout << "Sending to the doctor to measure  blood pressure, oxygen level, and glucose level.\n\n";
+
+                    cout << "->DOCTOR PORTAL\n\n";
+                    if (doc->is_health_ok())
+                    {
+                        cout << "\nYour health condition is OK for the vaccination process\n\n";
+
+                        cout << "->SELECT VACCINE\n\n";
+                        output_vaccines();
+
+                        cout << "Enter the index of vaccine: ";
+                        do
+                        {
+                            cin >> i;
+                            if (i > vacCount || i < 0)
+                            {
+                                print_error("\n[!] ERROR: The index entered in not valid.\n\n");
+                                cout << "Enter again: ";
+                            }
+                        } while (i > vacCount || i < 0);
+
+                        Filing::store_vac_citizen(cnic, vac_list[i-1].get_vacID());
+
+                        cout << "\n\nYOU HAVE BEEN VACCINATED !\n\n";
+                    }
+                }
+                else
+                {
+                    print_error("\n[!] ERROR: You are not eligible for vaccine\n\n");
+                }
+            }
+            else
+            {
+                print_error("\n[!] ERROR: You have already vaccinated\n\n");
+            }
+        }
+    }
+
+    bool fdo::compare_city(string c)
+    {
+        return city == c;
+    }
+
+    void fdo::input_login_details()
+    {
+        string un, un_num, p;
+        bool correct_input = false;
+
+        while (!correct_input)
+        {
+            try
+            {
+                un = "FD";
+                cout << "Enter the username: FD";
+                cin >> un_num;
+
+                if (!regex_match(un_num, valid_user_num))
+                {
+                    throw invalid_username();
+                }
+
+                un += un_num; // concats the digits with "AD"
+
+                if (Filing::find_fdo(un))
+                {
+                    throw username_exists();
+                }
+
+                cout << "\nEnter the password: ";
+                cin >> p;
+
+                if (!is_valid_password(p))
+                {
+                    throw invalid_password();
+                }
+
+                correct_input = true;
+            }
+            catch (const exception& e)
+            {
+                SetConsoleTextAttribute(h, 252);
+                print_spaces();
+                cout << "[!] Exception: " << e.what() << endl;
+                SetConsoleTextAttribute(h, 240);
+            }
+        }
+
+        username = un;
+        pass = encrypt(un, p);
+    }
+
+//------------------------ WAREHOUSE DEFINATIONS------------------------------------------------------------------
+
+    void warehouse::remove_vaccine(string vacID, int batchID)
+    {
+        int i = find_valid_vacID_batchID(vacID, batchID);
+
+        total_vac_amount -= vac_ware[i].get_quantity();
+
+        del<vaccines>(vac_ware, vaccineCount, i);
+        vaccineCount--;
+
+        Filing::delete_warehouse_vaccine(houseID, this, vacID, to_string(batchID));
+
+    }

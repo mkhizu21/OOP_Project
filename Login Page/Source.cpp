@@ -13,73 +13,74 @@ using namespace std;
 
 
 string banner = R"(
-                     __     __             _               ____            _        _ 
-                     \ \   / /_ _  ___ ___(_)_ __   ___   |  _ \ ___  _ __| |_ __ _| |
-                      \ \ / / _` |/ __/ __| | '_ \ / _ \  | |_) / _ \| '__| __/ _` | |
-                       \ V / (_| | (_| (__| | | | |  __/  |  __/ (_) | |  | || (_| | |
-                        \_/ \__,_|\___\___|_|_| |_|\___|  |_|   \___/|_|   \__\__,_|_|
-                                                                 
+
+                          __     __             _               ____            _        _ 
+                          \ \   / /_ _  ___ ___(_)_ __   ___   |  _ \ ___  _ __| |_ __ _| |
+                           \ \ / / _` |/ __/ __| | '_ \ / _ \  | |_) / _ \| '__| __/ _` | |
+                            \ V / (_| | (_| (__| | | | |  __/  |  __/ (_) | |  | || (_| | |
+                             \_/ \__,_|\___\___|_|_| |_|\___|  |_|   \___/|_|   \__\__,_|_|
+                                                                      
 
 )";
 
 string banner0 = R"(
 
-                     __     __ 
-                     \ \   / /_
-                      \ \ / / _
-                       \ V / (_
-                        \_/ \__
-                                                                 
+                          __     __ 
+                          \ \   / /_
+                           \ \ / / _
+                            \ V / (_
+                             \_/ \__
+                                                                      
 
 )";
 string banner1 = R"(
 
-                     __     __             
-                     \ \   / /_ _  ___ ___(
-                      \ \ / / _` |/ __/ __|
-                       \ V / (_| | (_| (__|
-                        \_/ \__,_|\___\___|
-                                                                 
+                          __     __             
+                          \ \   / /_ _  ___ ___(
+                           \ \ / / _` |/ __/ __|
+                            \ V / (_| | (_| (__|
+                             \_/ \__,_|\___\___|
+                                                                      
 
 )";
 string banner2 = R"(
 
-                     __     __             _    
-                     \ \   / /_ _  ___ ___(_)_ _
-                      \ \ / / _` |/ __/ __| | '_
-                       \ V / (_| | (_| (__| | | 
-                        \_/ \__,_|\___\___|_|_| 
-                                                                 
+                          __     __             _    
+                          \ \   / /_ _  ___ ___(_)_ _
+                           \ \ / / _` |/ __/ __| | '_
+                            \ V / (_| | (_| (__| | | 
+                             \_/ \__,_|\___\___|_|_| 
+                                                                      
 
 )";
 string banner3 = R"(
 
-                     __     __             _           
-                     \ \   / /_ _  ___ ___(_)_ __   ___
-                      \ \ / / _` |/ __/ __| | '_ \ / _ 
-                       \ V / (_| | (_| (__| | | | |  __
-                        \_/ \__,_|\___\___|_|_| |_|\___
-                                                                 
+                          __     __             _           
+                          \ \   / /_ _  ___ ___(_)_ __   ___
+                           \ \ / / _` |/ __/ __| | '_ \ / _ 
+                            \ V / (_| | (_| (__| | | | |  __
+                             \_/ \__,_|\___\___|_|_| |_|\___
+                                                                      
 
 )";
 string banner4 = R"(
 
-                     __     __             _               ____     
-                     \ \   / /_ _  ___ ___(_)_ __   ___   |  _ \ ___
-                      \ \ / / _` |/ __/ __| | '_ \ / _ \  | |_) / _ 
-                       \ V / (_| | (_| (__| | | | |  __/  |  __/ (_)
-                        \_/ \__,_|\___\___|_|_| |_|\___|  |_|   \___
-                                                                 
+                          __     __             _               ____     
+                          \ \   / /_ _  ___ ___(_)_ __   ___   |  _ \ ___
+                           \ \ / / _` |/ __/ __| | '_ \ / _ \  | |_) / _ 
+                            \ V / (_| | (_| (__| | | | |  __/  |  __/ (_)
+                             \_/ \__,_|\___\___|_|_| |_|\___|  |_|   \___
+                                                                      
 
 )";
 string banner5 = R"(
 
-                     __     __             _               ____           
-                     \ \   / /_ _  ___ ___(_)_ __   ___   |  _ \ ___  _ __
-                      \ \ / / _` |/ __/ __| | '_ \ / _ \  | |_) / _ \| '__
-                       \ V / (_| | (_| (__| | | | |  __/  |  __/ (_) | |  
-                        \_/ \__,_|\___\___|_|_| |_|\___|  |_|   \___/|_|  
-                                                                 
+                          __     __             _               ____           
+                          \ \   / /_ _  ___ ___(_)_ __   ___   |  _ \ ___  _ __
+                           \ \ / / _` |/ __/ __| | '_ \ / _ \  | |_) / _ \| '__
+                            \ V / (_| | (_| (__| | | | |  __/  |  __/ (_) | |  
+                             \_/ \__,_|\___\___|_|_| |_|\___|  |_|   \___/|_|  
+                                                                      
 
 )";
 
@@ -92,25 +93,25 @@ void loading_animation()
 {
 	wait(1000);
 	system("clear");
-	cout << "\n\n" << banner0;
+	cout << "\n\n\n\n\n\n\n\n" << banner0;
 	wait();
 	system("clear");
-	cout << "\n\n" << banner1;
+	cout << "\n\n\n\n\n\n\n\n" << banner1;
 	wait();
 	system("clear");
-	cout << "\n\n" << banner2;
+	cout << "\n\n\n\n\n\n\n\n" << banner2;
 	wait();
 	system("clear");
-	cout << "\n\n" << banner3;
+	cout << "\n\n\n\n\n\n\n\n" << banner3;
 	wait();
 	system("clear");
-	cout << "\n\n" << banner4;
+	cout << "\n\n\n\n\n\n\n\n" << banner4;
 	wait();
 	system("clear");
-	cout << "\n\n" << banner5;
+	cout << "\n\n\n\n\n\n\n\n" << banner5;
 	wait();
 	system("clear");
-	cout << "\n\n" << banner;
+	cout << "\n\n\n\n\n\n\n\n" << banner;
 
 	for (int i = 0; i < 5; i++)
 	{
@@ -218,17 +219,92 @@ void login_page(string& username, string& pass)
 
 void super_admin_page(string username)
 {
+	bool loop = true;
+	char choice;
 	super_admin* SA = Filing::login_super_admin(username);
-	SA->output();
-	SA->display_admin();
-	SA->create_admin();
+	while (loop)
+	{
+		heading("SUPER ADMIN MENU");
+
+		print_spaces();
+		cout << "1. Create Admin\n";
+		print_spaces();
+		cout << "2. Remove Admin\n";
+		print_spaces();
+		cout << "3. Update Admin\n";
+		print_spaces();
+		cout << "4. Display Admins\n";
+		print_spaces();
+		cout << "5. Create FDO\n";
+		print_spaces();
+		cout << "6. Display FDOs\n";
+		print_spaces();
+		cout << "7. Exit\n";
+
+		print_spaces();
+		cout << "ENTER ANY OPTION";
+		choice = _getch();
+
+		switch (choice)
+		{
+		case '1':
+			heading("CREATE ADMIN");
+
+			SA->create_admin();
+			break;
+
+		case '2':
+			heading("REMOVE ADMIN");
+
+			SA->delete_admin();
+			break;
+
+
+		case '3':
+			heading("UPDATE ADMIN");
+
+			SA->update_admin();
+			break;
+
+		case '4':
+			heading("DISPLAY ADMINs");
+
+			SA->display_admin();
+			break;
+
+
+		case '5':
+			heading("CREATE FDO");
+
+			SA->create_fdo();
+			break;
+
+		case '6':
+			heading("DISPLAY FDOs");
+
+			SA->display_fdo();
+			break;
+
+
+		default:
+			print_error("\n\n[!] EXITING SUPER ADMIN MENU [!]\n");
+
+			loop = false;
+			break;
+		}
+
+		cout << "\n\nPRESS ANY KEY TO CONTINUE";
+		_getch();
+
+	}
 }
 
 void admin_page(string username)
 {
 	bool loop = true;
 	char choice;
-	admin* ADMIN = super_admin::admin_obj(username);
+	admin* ADMIN = nullptr;
+	ADMIN = super_admin::admin_obj(username);
 	while (loop)
 	{
 		heading("ADMIN MENU");
@@ -316,9 +392,60 @@ void admin_page(string username)
 
 }
 
+void fdo_page(string username)
+{
+
+	bool loop = true;
+	char choice;
+	fdo* FDO = nullptr;
+	FDO = super_admin::fdo_obj(username);
+
+	while (loop)
+	{
+		heading("FDO MENU");
+
+		print_spaces();
+		cout << "1. Get Vaccine\n";
+		print_spaces();
+		cout << "2. Vaccinate Citizen\n";
+		print_spaces();
+		cout << "3. Exit\n";
+
+		print_spaces();
+		cout << "ENTER ANY OPTION";
+		choice = _getch();
+
+		switch (choice)
+		{
+		case '1':
+			heading("GET VACCINE");
+
+			FDO->get_vaccine();
+			break;
+
+		case '2':
+			heading("VACCINATE CITIZEN");
+
+			FDO->vacinate_citizen();
+			break;
+
+
+		default:
+			print_error("\n\n[!] EXITING FDO MENU [!]\n");
+
+			loop = false;
+			break;
+		}
+
+		cout << "\n\nPRESS ANY KEY TO CONTINUE";
+		_getch();
+
+	}
+}
+
 void login_process(string username, string pass)
 {
-	string modes[5] = { "SA", "AD", "DC", "FD", "GO" };
+	string modes[4] = { "SA", "AD", "FD", "GO" };
 	string mode = username.substr(0, 2);
 	try
 	{
@@ -358,31 +485,13 @@ void login_process(string username, string pass)
 				//throw unregistered_username();
 			}
 		}
-		else if (mode == modes[2]) // Doctor
-		{
-			if (Filing::find_doctor(username))
-			{
-				if (Filing::is_valid_login_doctor(username, pass))
-				{
-					//doctor_page(username);
-				}
-				else
-				{
-					//throw wrong_password();
-				}
-			}
-			else
-			{
-				//throw unregistered_username();
-			}
-		}
-		else if (mode == modes[3]) // Front Desk Officer
+		else if (mode == modes[2]) // Front Desk Officer
 		{
 			if (Filing::find_fdo(username))
 			{
 				if (Filing::is_valid_login_fdo(username, pass))
 				{
-					//fdo_page(username);
+					fdo_page(username);
 				}
 				else
 				{
@@ -394,7 +503,7 @@ void login_process(string username, string pass)
 				//throw unregistered_username();
 			}
 		}
-		else if (mode == modes[4]) // Government Offcial
+		else if (mode == modes[3]) // Government Offcial
 		{
 			if (Filing::find_gov_off(username))
 			{
@@ -424,26 +533,114 @@ void login_process(string username, string pass)
 		
 }
 
+void register_citizen()
+{
+	string CNIC;
+	citizen CITIZEN;
+	cout << "Enter CNIC: ";
+
+	do
+	{
+		cin >> CNIC;
+		if (!is_valid_cnic(CNIC))
+		{
+			print_error("\n[!] ERROR: The CNIC entered in not valid.\n\n");
+			cout << "Enter again: ";
+		}
+	} while (!is_valid_cnic(CNIC));
+
+	if (Filing::find_citizen(CNIC))
+	{
+		cout << "\n\n ->ALREADY REGISTERED<-\n\n";
+
+		CITIZEN = Filing::load_citizen(CNIC);
+
+		cout << "->CITIZEN INFO\n\n";
+		CITIZEN.citizen_output();
+
+		if (Filing::already_vacinated(CNIC))
+		{
+			cout << "\nVaccinated Status: True\n";
+		}
+		else
+		{
+			cout << "\nVaccinated Status: False\n";
+		}
+	}
+	else
+	{
+		cout << "\n\n ->NOT REGISTERED<-\n\n";
+
+		cout << "->CITIZEN INFO\n\n";
+		CITIZEN.citizen_input();
+
+		Filing::add_new_citizen(&CITIZEN);
+
+		cout << "\n\n ->YOU HAVE REGISTERED SUCCESSFULLY\n\n";
+	}
+
+}
+
 int main()
 {
-	
-	string a, b;
+	char x;
+	string username, pass;
+	bool loop = true;
+	char choice;
 
 	Filing::login_super_admin("SA90530");
 
 	system("cls");
 	loading_animation();
-	system("cls");
+
 	system("Color F0");
-	login_page(a, b);
+	while (loop)
+	{
+		username = pass = "";
 
-	login_process(a, b);
+		system("cls");
+		heading("MAIN MENU");
 
-	
+		print_spaces();
+		cout << "1. Admin Login\n";
+		print_spaces();
+		cout << "2. Register Citizen\n";
+		print_spaces();
+		cout << "3. Exit\n";
+
+		print_spaces();
+		cout << "ENTER ANY OPTION";
+		choice = _getch();
+
+		switch (choice)
+		{
+		case '1':
+			system("cls");
+			login_page(username, pass);
+			login_process(username, pass);
+			break;
+
+		case '2':
+			heading("REGISTER CITIZEN");
+
+			register_citizen();
+			break;
+
+
+		default:
+			print_error("\n\n[!] EXITING FDO MENU [!]\n");
+
+			loop = false;
+			break;
+		}
+
+		cout << "\n\nPRESS ANY KEY TO CONTINUE";
+		_getch();
+
+	}
 
 
 
-	
 
 	system("pause");
 	return 0;
