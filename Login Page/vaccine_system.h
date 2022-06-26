@@ -6,10 +6,11 @@
 #include <vector>
 #include <windows.h>
 #include <regex> 
+#include <iomanip>
 using namespace std;
 
 
-regex valid_email("[a-zA-Z_0-9]+@[a-zA-Z0-9]+.[a-zA-Z]+");
+regex valid_email("[a-zA-Z_0-9._]+@[a-zA-Z0-9]+.[a-zA-Z]+");
 regex valid_contact_num("(03)[0-9]{2}-[0-9]{7}");
 regex valid_user_num("[0-9]{5}");
 regex valid_cnic("[0-9]{5}-[0-9]{7}-[0-9]");
@@ -112,7 +113,7 @@ bool is_valid_blood_group(string bg)
     }
     else if(bg.size() == 3)
     {
-        if(bg[0] == 'AB')
+        if(bg[0] == 'A' && bg[1]=='B')
          {
             if(bg[2] == '+' || bg[2] == '-')
             {
@@ -151,8 +152,24 @@ public:
         return ("The entered password is not valid.");
     }
 };
-class wrong_password;
-class unregistered_username;
+class wrong_password : public exception
+{
+
+public:
+    const char* what() const
+    {
+        return ("The entered password is incorrect.");
+    }
+};
+class unregistered_username : public exception
+{
+
+public:
+    const char* what() const
+    {
+        return ("The entered username is not registered.");
+    }
+};
 //-------------------------------------------------------------
 
 void print_error(string output)
@@ -287,10 +304,6 @@ void print_spaces(int space = 38)
     cout << "\n" << setfill(' ') << setw(space) << "";
 }
 
-
-
-
-
 class Filing;
 
 class person
@@ -300,116 +313,18 @@ protected:
     string firstname, lastname, email, CNIC, contactNumber;
 
 public:
-    person()
-    {
-        username = pass = firstname = lastname = email = contactNumber = CNIC = " ";
+    person();
+    person(string un, string fn, string ln, string em, string cn, string No);
+    void input();
+    void output();
 
-    }
-    person(string un, string fn, string ln, string em, string cn, string No) :username(un), firstname(fn), lastname(ln), email(em), CNIC(cn), contactNumber(No) {}
+    bool compare_username(string un);
 
-    void input()
-    {
-        
-        cout << "Enter First Name: ";
-        do
-        {
-            cin >> firstname;
-            if (!is_valid_name(firstname))
-            {
-                print_error("\n[!] ERROR: The name should only have alphabets.\n\n");
-                cout << "Enter again: ";
-            }
-        } while (!is_valid_name(firstname));
-        
-        cout << "Enter last Name: ";
-        do
-        {
-            cin >> lastname;
-            if (!is_valid_name(lastname))
-            {
-                print_error("\n[!] ERROR: The name should only have alphabets.\n\n");
-                cout << "Enter again: ";
-            }
-        } while (!is_valid_name(lastname));
+    virtual string file_details();
 
-        cout << "Enter Email Address: ";
-        do
-        {
-            cin >> email;
-            if (!is_valid_email(email))
-            {
-                print_error("\n[!] ERROR: The email entered in not valid.\n\n");
-                cout << "Enter again: ";
-            }
-        } while (!is_valid_email(email));
-        
-        cout << "Enter CNIC: ";
-        
-        do
-        {
-            cin >> CNIC;
-            if (!is_valid_cnic(CNIC))
-            {
-                print_error("\n[!] ERROR: The CNIC entered in not valid.\n\n");
-                cout << "Enter again: ";
-            }
-        } while (!is_valid_cnic(CNIC));
+    string file_logindetails();
 
-        cout << "Enter Contact Number: ";
-        do
-        {
-            cin >> contactNumber;
-            if (!is_valid_contact(contactNumber))
-            {
-                print_error("\n[!] ERROR: The phone number entered in not valid.\n\n");
-                cout << "Enter again: ";
-            }
-        } while (!is_valid_contact(contactNumber));
-
-
-        
-    }
-
-    void output()
-    {
-        cout << "First Name: " << firstname << endl;
-        cout << "last Name: " << lastname << endl;
-        cout << "Email Address: " << email << endl;
-        cout << "Contact Number: " << contactNumber << endl;
-        cout << "CNIC: " << CNIC << endl;
-    }
-
-    bool compare_username(string un)
-    {
-        if (username == un)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    virtual string file_details()
-    {
-        return  username + "," + firstname + "," + lastname + "," + email + "," + CNIC + "," + contactNumber + ",";
-    }
-
-    string file_logindetails()
-    {
-        return username + " " + pass + "\n";
-    }
-
-    void load_person_data(string un, string fn, string ln, string em, string cn, string No)
-    {
-        username = un;
-        firstname = fn;
-        lastname = ln;
-        email = em;
-        CNIC = cn;
-        contactNumber = No;
-    }
+    void load_person_data(string un, string fn, string ln, string em, string cn, string No);
     
     
     virtual void input_login_details() = 0; // input username and password
@@ -426,80 +341,25 @@ private:
     int batchNo;
 public:
     vaccines() {}
-    void vaccineInput()
-    {
-        cout << "Vaccine ID: ";
-        cin >> vaccineID;
-        cout << "Enter Vaccine Name: ";
-        cin >> vaccineName;
-        cout << "Enter no of doses: ";
-        cin >> Nofdoses;
-        cout << "Enter the price of vaccine: ";
-        cin >> price;
-        cout << "Enter the quantity of vaccine: ";
-        cin >> quantity;
-    }
-    void vaccineOutput(bool bNO = false) // bNO tells wheter to print BatchNo or not
-    {
-        cout << "Vaccine ID: " << vaccineID << endl;
-        cout << "Vaccine Name: " << vaccineName << endl;
-        cout << "No. of doses: " << Nofdoses << endl;
-        cout << "Price of vaccine: "<< price << endl;
-        cout << "Quantity of vaccine: " << quantity << endl;
-        if(bNO)
-        cout << "BatchID: " << batchNo << endl;
-    }
+    void vaccineInput();
+    void vaccineOutput(bool bNO = false);
 
-    string file_details()
-    {
-        return vaccineID + "," + to_string(batchNo) + "," + vaccineName + "," + to_string(Nofdoses) + "," + to_string(price) + "," + to_string(quantity) + ",\n";
-    }
-    void load_data(string vID, string vName, string NoDoses, string p, string q)
-    {
-        vaccineID = vID;
-        vaccineName = vName;
-        Nofdoses = stoi(NoDoses);
-        price = stoi(p);
-        quantity = stoi(q);
-    }
-    void set_batchNo(int num)
-    {
-        batchNo = num;
-    }
+    string file_details();
+    void load_data(string vID, string vName, string NoDoses, string p, string q);
+    void set_batchNo(int num);
 
-    void set_quantity(int q)
-    {
-        quantity = q;
-    }
+    void set_quantity(int q);
 
-    int get_batchNo()
-    {
-        return batchNo;
-    }
+    int get_batchNo();
 
-    string get_vacName()
-    {
-        return vaccineName;
-    }
+    string get_vacName();
 
-    string get_vacID()
-    {
-        return vaccineID;
-    }
+    string get_vacID();
 
-    int get_Nofdoses()
-    {
-        return Nofdoses;
-    }
-    int get_price()
-    {
-        return price;
-    }
+    int get_Nofdoses();
+    int get_price();
     
-    int get_quantity()
-    {
-        return quantity;
-    }
+    int get_quantity();
 
 };
 
@@ -512,60 +372,23 @@ private:
 
     //taken from file
 public:
-    company()
-    {
-        vac = new vaccines;
-        lastBatchNo = 0;
-    }
-    void companyInput() //admin can add companies
-    {
-        cout << "Enter company name: ";
-        cin >> companyName;
-        
-        vac->vaccineInput();
-    }
-    void companyoutput() //review company details
-    {
-        cout << "Company Name: " << companyName << endl;
-        vac->vaccineOutput();
-    }
+    company();
+    void companyInput();
+    void companyoutput();
     
-    vaccines* get_vac()
-    {
-        return vac;
-    }
-    int get_vac_quantity()
-    {
-        return vac->get_quantity();
-    }
+    vaccines* get_vac();
+    int get_vac_quantity();
 
-    string file_details()
-    {
-        return companyName + "," + to_string(lastBatchNo) +"," + vac->get_vacID() + "," + vac->get_vacName() + "," + to_string(vac->get_Nofdoses()) + "," + to_string(vac->get_price()) + "," + to_string(vac->get_quantity()) + ",\n" ;
-    }
+    string file_details();
 
-    bool compare_companyName(string n)
-    {
-        return n == companyName;
-    }
+    bool compare_companyName(string n);
 
-    void load_data(string cname, string LbNo, string vID, string vName, string NoDoses, string price, string quantity)
-    {
-        companyName = cname;
-        lastBatchNo = stoi(LbNo);
-        vac->load_data(vID, vName, NoDoses, price, quantity);
-    }
+    void load_data(string cname, string LbNo, string vID, string vName, string NoDoses, string price, string quantity);
 
-    int get_batchID()
-    {
-        lastBatchNo++;
-        return lastBatchNo;
-    }
+    int get_batchID();
 
-    //friend void getvaccine(int buyvaccine, company comp, warehouse ware);
+    
 };
-
-
 
 class warehouse
 {
@@ -574,154 +397,45 @@ private:
     string houseID; //to specify a warehouse
     int limit, total_vac_amount;
     int vaccineCount;//count type of vaccines in this warehouse
-    //location class will have composition here
+    
 
 public:
-    bool is_enough_space(int x)
-    {
-        return (limit - total_vac_amount) >= x;
-    }
-    warehouse()
-    {
-        total_vac_amount = vaccineCount = 0;
-    }
+    bool is_enough_space(int x);
+    warehouse();
 
-    void houseInput()
-    {
-        cout << "Enter Warehouse ID: ";
-        cin >> houseID;
-        cout << "Enter Storage capacity: ";
-        cin >> limit;
+    void houseInput();
 
-    }
+    void houseOutput();
 
-    void houseOutput()
-    {
-        cout << "Warehouse ID: " << houseID << endl;
-        cout << "Current Vaccine amount: " << total_vac_amount << endl;
-        cout << "Storage limit: " << limit << endl;
-        cout << "No of batches available: " << vaccineCount << endl;
-    }
+    void vaccinesOutput();
 
-    void vaccinesOutput()
-    {
-        for (int i = 0; i < vaccineCount; i++)
-        {
-            cout << "\n";
-            vac_ware[i].vaccineOutput(true);
-        }
-    }
+    void load_vaccine(string vID, string lbatch, string vName, string NoDoses, string price, string quantity);
 
-    void load_vaccine(string vID, string lbatch, string vName, string NoDoses, string price, string quantity)
-    {
-        expand<vaccines>(vac_ware, vaccineCount);
+    vaccines* get_vaccine(int i);
 
-        vac_ware[vaccineCount-1].load_data(vID, vName, NoDoses, price, quantity);
-        vac_ware[vaccineCount-1].set_batchNo(stoi(lbatch));
-    }
-
-    vaccines* get_vaccine(int i)
-    {
-        return &vac_ware[i];
-    }
-
-    void add_new_vaccine(vaccines *v, int lbatch)
-    {
-        string vID  = v->get_vacID();
-        string vName  = v->get_vacName();
-        string NoDoses  = to_string(v->get_Nofdoses());
-        string price = to_string(v->get_price());
-        string quantity = to_string(v->get_quantity());
-
-       expand<vaccines>(vac_ware, vaccineCount);
-
-       vac_ware[vaccineCount-1].load_data(vID, vName, NoDoses, price, quantity);
-       vac_ware[vaccineCount-1].set_batchNo(lbatch);
-
-       total_vac_amount += v->get_quantity();
-    }
+    void add_new_vaccine(vaccines* v, int lbatch);
 
     void remove_vaccine(string vacID, int batchID);
 
 
-    string file_details()
-    {
-        return houseID + "," + to_string(limit) + "," + to_string(total_vac_amount) + "," + to_string(vaccineCount) + ",\n";
-    }
+    string file_details();
 
-    void load_data(string id, string l, string vac_amt, string vacC)
-    {
-        houseID = id; 
-        limit = stoi(l); 
-        total_vac_amount = stoi(vac_amt);
-        vaccineCount = stoi(vacC);
-    }
+    void load_data(string id, string l, string vac_amt, string vacC);
 
-    bool compare_warehouseID(string n)
-    {
-        return n == houseID;
-    }
+    bool compare_warehouseID(string n);
 
-    int find_valid_vacID_batchID(string vID, int bID)
-    {
-        for (int i = 0; i < vaccineCount; i++)
-        {
-            if (vID == vac_ware[i].get_vacID() && bID == vac_ware[i].get_batchNo())
-            {
-                return i;
-            }
-        }
+    int find_valid_vacID_batchID(string vID, int bID);
 
-        return -1;
-    }
-
-    //friend void getvaccine(int buyvaccine, company comp, warehouse ware);
+    
 };
-//void getvaccine(int buyvaccine, company comp, warehouse ware)
-//{
-//	if (buyvaccine <= comp.vac->getvacNo())
-//	{
-//		int VN = comp.vac->getvacNo();
-//		VN -= buyvaccine;
-//		comp.vac->setvacNo(VN);
-//		cout << "Enter warehouse ID for storage: ";
-//		cin >> ware.
-//	}
-//	else
-//	{
-//		cout << "not enough vaccines" << endl;
-//	}
-//}
 
 class doctor :public person
 {
 public:
-    doctor()
-    {
-        username = "doctor";
-    }
-    bool is_health_ok()
-    {
-        int bloodPressure, OxyLvl, GlucoseLvl;
+    doctor();
+    bool is_health_ok();
 
-        cout << "Enter Blood Pressure: ";
-        bloodPressure = safe_input<int>();
-        cout << "Enter Oxygen Level: ";
-        OxyLvl = safe_input<int>();
-        cout << "Enter GlucoseLvl: ";
-        GlucoseLvl = safe_input<int>();
-
-        if (bloodPressure <= 120 && OxyLvl >= 95 && GlucoseLvl >= 70 && GlucoseLvl <= 100)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    void input_login_details() {}
+    void input_login_details(){}
 };
 
 class fdo :public person 
@@ -753,8 +467,6 @@ public:
     void input_login_details();
 
 };
-
-
 
 class admin : public person
 {
@@ -816,20 +528,7 @@ public:
         return -1;
     }
 
-    static bool does_vac_center_exists_in(string c)
-    {
-        for (int i = 0; i < fdo_count; i++)
-        {
-            if (fdo_list[i].compare_city(c))
-            {
-                return true;
-            }
-
-        }
-
-        return false;
-
-    }
+    
 };
 
 int admin::companies_count = 0;
@@ -841,12 +540,20 @@ company* admin::companies_list = nullptr;
 warehouse* admin::warehouses_list = nullptr;
 fdo* admin::fdo_list = nullptr;
 
-
-
 class gov_off :public person 
 {
 public:
-    void input_login_details() {}
+    void input_login_details();
+    void load_gov_off_data(string un, string fn, string ln, string em, string cn, string No);
+
+    void percentage_vac_population();
+    void percentage_partially_vac_population();
+
+    void display_graph();
+    void display_vac_population();
+    void display_partially_vac_population();
+    void display_citizen_with_VacID();
+
 };
 
 class super_admin : public person
@@ -877,24 +584,9 @@ public:
 
     static super_admin* getInstance(string un, string fn, string ln, string em, string cn, string No);
 
-    static admin* admin_obj(string un)
-    {
-        int i = find_admin_index(un);
-        if (i != -1)
-        {
-            return &admin_list[i];
-        }
-
-    }
-    static fdo* fdo_obj(string un)
-    {
-        int i = find_fdo_index(un);
-        if (i != -1)
-        {
-            return &fdo_list[i];
-        }
-
-    }
+    static admin* admin_obj(string un);
+    static fdo* fdo_obj(string un);
+    static gov_off* gov_off_obj(string un);
 
     void create_admin();
     void delete_admin();
@@ -915,13 +607,11 @@ public:
     void create_gov_off();
     void delete_gov_off();
     void update_gov_off();
+    void display_gov_off();
 
-
+    static bool does_vac_center_exists_in(string c);
 
     void input_login_details();
-
-
-
 
 };
 
@@ -936,7 +626,6 @@ doctor* super_admin::doctor_list = nullptr;
 gov_off* super_admin::gov_off_list = nullptr;
 
 
-
 class citizen : public person
 {
 private:
@@ -944,92 +633,18 @@ private:
     string bloodType, city;
     bool is_eligible;
 public:
-    citizen()
-    {
-        username = "NULL";
-        is_eligible = true;
-    }
+    citizen();
 
-    citizen(string un, string fn, string ln, string em, string cn, string No, string Age, string bT, string City)
-    {
-        
-        is_eligible = true;
-        load_person_data("NULL", fn, ln, em, cn, No);
-        age = stoi(Age);
-        bloodType = bT;
-        city = City;
+    citizen(string un, string fn, string ln, string em, string cn, string No, string Age, string bT, string City);
+    void citizen_input();
 
-        if (age < 5)
-        {
-            is_eligible = false;
-        }
-    }
-    void citizen_input()
-    {
-        input();
+    void citizen_output();
 
-        cout << "Enter age: ";
-        do
-        {
-            cin >> age;
-            if (age <= 0)
-            {
-                print_error("\n[!] ERROR: The age entered in not valid.\n\n");
-                cout << "Enter again: ";
-            }
-        } while (age <= 0);
+    bool get_eligibity();
 
-        if (age < 5)
-        {
-            is_eligible = false;
-        }
+    string file_details();
 
-        cout << "Enter blood type: ";
-        do
-        {
-            cin >> bloodType;
-            if (!is_valid_blood_group(bloodType))
-            {
-                print_error("\n[!] ERROR: The blood group entered in not valid.\n\n");
-                cout << "Enter again: ";
-            }
-
-        } while (!is_valid_blood_group(bloodType));
-
-        cout << "Enter city: ";
-        cin >> city;
-    }
-
-    void citizen_output()
-    {
-        output();
-        cout << "Age: " << age << endl;
-        cout << "Blood Group: " << bloodType << endl;
-        cout << "City: " << city << endl;
-    }
-
-    bool get_eligibity()
-    {
-        return is_eligible;
-    }
-
-    string file_details()
-    {
-        return person::file_details() + to_string(age) + "," + bloodType +"," + city +",";
-    }
-
-    void load_citizen(string un, string fn, string ln, string em, string cn, string No, string Age, string bT, string City)
-    {
-        load_person_data(un, fn, ln, em, cn, No);
-        age = stoi(Age);
-        bloodType = bT;
-        city = City;
-
-        if (age < 5)
-        {
-            is_eligible = false;
-        }
-    }
+    void load_citizen(string un, string fn, string ln, string em, string cn, string No, string Age, string bT, string City);
 
     void input_login_details(){}
 };
@@ -1037,1244 +652,177 @@ public:
  class Filing
  {
  public:
-     static bool find_super_admin(string username)
-     {
-         ifstream login_file(FILE_PATH + "super_admin_login_details.txt");
-         string o_username;
-
-         login_file >> o_username; // reads original username from the file
-
-
-         if (username == o_username)
-         {
-             return true;
-         }
-         else
-         {
-             return false;
-         }
-     }
-     static bool is_valid_login_super_admin(string username, string pass)
-     {
-         ifstream login_file(FILE_PATH + "super_admin_login_details.txt");
-         string o_username, o_pass;
-         int key = 0;
-
-         login_file >> o_username >> o_pass; // reads original username and password from the file
-
-         pass = encrypt(username, pass);
-
-         if (username == o_username && pass == o_pass)
-         {
-             return true;
-         }
-         else
-         {
-             return false;
-         }
-
-     }
-     static super_admin* login_super_admin(string username)
-     {
-         ifstream details_file(FILE_PATH + "super_admin_details.csv");
-         int count = 0;
-         string line, word;
-         string details[6];
-         //string o_username, fn, ln, em, cn, No;
-
-         getline(details_file, line);
-         stringstream str(line);
-
-         while (getline(str, word, ','))
-         {
-             details[count++] = word;
-         }
-
-         if (details[0] == username)
-         {
-             return super_admin::getInstance(details[0], details[1], details[2], details[3], details[4], details[5]);
-         }
-     }
-
-     static bool find_admin(string username)
-     {
-         ifstream login_file(FILE_PATH + "admin_login_details.txt");
-
-         bool found = false;
-         string o_username, o_pass;
-
-         // reads original username from the file
-         while (!login_file.eof())
-         {
-             login_file >> o_username >> o_pass;
-             if (username == o_username)
-             {
-                 found = true;
-                 break;
-             }
-
-         }
-         login_file.close();
-
-         return found;
-     }
-     static bool is_valid_login_admin(string username, string pass)
-     {
-         ifstream login_file(FILE_PATH + "admin_login_details.txt");
-
-         bool logined = false;
-         string o_username, o_pass;
-
-         // reads original username from the file
-         while (!login_file.eof())
-         {
-             login_file >> o_username >> o_pass;
-             if (username == o_username)
-             {
-                 pass = encrypt(username, pass);
-
-                 if (pass == o_pass)
-                 {
-                     logined = true;
-                     break;
-                 }
-             }
-
-         }
-         login_file.close();
-
-         return logined;
-     }
-
-     static void initiate_all_admin(admin*& admin_list, int& admin_count)
-     {
-         ifstream details_file(FILE_PATH + "admin_details.csv");
-         int count = 0;
-         string line, word;
-         string details[7];
-         //string o_username, fn, ln, em, cn, No, tprice;
-         
-         while (getline(details_file, line))
-         {
-             count = 0;
-             stringstream str(line);
-
-             while (getline(str, word, ','))
-             {
-                 details[count++] = word;
-             }
-             cout << details[0] << endl;
-             cout << admin_count << endl;
-             expand<admin>(admin_list, admin_count);
-             
-             admin_list[admin_count-1].load_admin_data(details[0], details[1], details[2], details[3], details[4], details[5], details[6]);
-         }
-         
-     }
-
-     static void add_new_admin(admin* obj)
-     {
-         ofstream details_file(FILE_PATH + "admin_details.csv", ios::app);
-         ofstream login_file(FILE_PATH + "admin_login_details.txt", ios::app);
-
-         if (!details_file || !login_file)
-         {
-             //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
-         }
-         else
-         {
-             details_file << obj->file_details();
-             login_file << obj->file_logindetails();
-
-             details_file.close();
-             login_file.close();
-         }
-     }
-     static void store_deleted_admins(string username, admin* arr, int size)
-     {
-         ofstream details_file(FILE_PATH + "admin_details.csv");
-
-
-         if (!details_file)
-         {
-             print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv\n\n");
-         }
-         else
-         {
-             for (int i = 0; i < size; i++)
-             {
-                 details_file << arr[i].file_details();
-             }
-
-             details_file.close();
-         }
-
-         vector<string> o_username, o_pass;
-         string un, pass;
-         int count = 0;;
-
-         ifstream login_input_file(FILE_PATH + "admin_login_details.txt");
-
-         while (!login_input_file.eof())
-         {
-             login_input_file >> un >> pass;
-             o_username.push_back(un);
-             o_pass.push_back(pass);
-             count++;
-         }
-         login_input_file.close();
-
-         ofstream login_output_file(FILE_PATH + "admin_login_details.txt");
-
-         for (int i = 0; i < count; i++)
-         {
-             if (username != o_username[i])
-             {
-                 login_output_file << o_username[i] << " " << o_pass[i] << endl;
-             }
-         }
-
-         login_output_file.close();
-     }
-     static void store_updated_admins(string username, admin* arr, int size)
-     {
-         ofstream details_file(FILE_PATH + "admin_details.csv");
-
-
-         if (!details_file)
-         {
-             //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
-         }
-         else
-         {
-             for (int i = 0; i < size; i++)
-             {
-                 details_file << arr[i].file_details();
-             }
-
-             details_file.close();
-         }
-
-         vector<string> o_username, o_pass;
-         string un, pass;
-         int count = 0;;
-
-         ifstream login_input_file(FILE_PATH + "admin_login_details.txt");
-
-         while (!login_input_file.eof())
-         {
-             login_input_file >> un >> pass;
-             o_username.push_back(un);
-             o_pass.push_back(pass);
-             count++;
-         }
-         login_input_file.close();
-
-         ofstream login_output_file(FILE_PATH + "admin_login_details.txt");
-
-         for (int i = 0; i < count; i++)
-         {
-             if (username == o_username[i])
-             {
-                 login_output_file << arr[i].file_logindetails();
-             }
-             else
-             {
-                 login_output_file << o_username[i] << " " << o_pass[i] << endl;
-             }
-         }
-
-         login_output_file.close();
-     }
-
-     static bool find_doctor(string username)
-     {
-         ifstream login_file(FILE_PATH + "doctor_login_details.txt");
-
-         bool found = false;
-         string o_username, o_pass;
-
-
-         while (!login_file.eof())
-         {
-             login_file >> o_username >> o_pass;  // reads original username from the file
-             if (username == o_username)
-             {
-                 found = true;
-                 break;
-             }
-             login_file >> o_username >> o_pass;
-         }
-         login_file.close();
-
-         return found;
-     }
-     static bool is_valid_login_doctor(string username, string pass)
-     {
-         ifstream login_file(FILE_PATH + "doctor_login_details.txt");
-
-         bool logined = false;
-         string o_username, o_pass;
-
-
-         while (!login_file.eof())
-         {
-             login_file >> o_username >> o_pass; // reads original username from the file
-             if (username == o_username)
-             {
-                 pass = encrypt(username, pass);
-
-                 if (pass == o_pass)
-                 {
-                     logined = true;
-                     break;
-                 }
-             }
-
-         }
-         login_file.close();
-
-         return logined;
-     }
-     static void add_new_doctor(doctor* obj)
-     {
-         ofstream details_file(FILE_PATH + "doctor_details.csv", ios::app);
-         ofstream login_file(FILE_PATH + "doctor_login_details.txt", ios::app);
-
-         if (!details_file || !login_file)
-         {
-             //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
-         }
-         else
-         {
-             details_file << obj->file_details();
-             login_file << obj->file_logindetails();
-
-             details_file.close();
-             login_file.close();
-         }
-     }
-     static void store_deleted_doctors(string username, doctor* arr, int size)
-     {
-         ofstream details_file(FILE_PATH + "doctor_details.csv");
-
-
-         if (!details_file)
-         {
-             //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
-         }
-         else
-         {
-             for (int i = 0; i < size; i++)
-             {
-                 details_file << arr[i].file_details();
-             }
-
-             details_file.close();
-         }
-
-         vector<string> o_username, o_pass;
-         string un, pass;
-         int count = 0;;
-
-         ifstream login_input_file(FILE_PATH + "doctor_login_details.txt");
-
-         while (!login_input_file.eof())
-         {
-             login_input_file >> un >> pass;
-             o_username.push_back(un);
-             o_pass.push_back(pass);
-             count++;
-         }
-         login_input_file.close();
-
-         ofstream login_output_file(FILE_PATH + "doctor_login_details.txt");
-
-         for (int i = 0; i < count; i++)
-         {
-             if (username != o_username[i])
-             {
-                 login_output_file << o_username[i] << " " << o_pass[i] << endl;
-             }
-         }
-
-         login_output_file.close();
-     }
-     static void store_updated_doctors(string username, doctor* arr, int size)
-     {
-         ofstream details_file(FILE_PATH + "doctor_details.csv");
-
-
-         if (!details_file)
-         {
-             //print_error("\n\nERROR IN OPENING THE FILE: doctor_details.csv or admin_login_details.txt\n\n");
-         }
-         else
-         {
-             for (int i = 0; i < size; i++)
-             {
-                 details_file << arr[i].file_details();
-             }
-             details_file.close();
-         }
-
-         vector<string> o_username, o_pass;
-         string un, pass;
-         int count = 0;;
-
-         ifstream login_input_file(FILE_PATH + "doctor_login_details.txt");
-
-         while (!login_input_file.eof())
-         {
-             login_input_file >> un >> pass;
-             o_username.push_back(un);
-             o_pass.push_back(pass);
-             count++;
-         }
-         login_input_file.close();
-
-         ofstream login_output_file(FILE_PATH + "doctor_login_details.txt");
-
-         for (int i = 0; i < count; i++)
-         {
-             if (username == o_username[i])
-             {
-                 login_output_file << arr[i].file_logindetails();
-             }
-             else
-             {
-                 login_output_file << o_username[i] << " " << o_pass[i] << endl;
-             }
-         }
-
-         login_output_file.close();
-     }
-
-     static bool find_fdo(string username)
-     {
-         ifstream login_file(FILE_PATH + "fdo_login_details.txt");
-
-         bool found = false;
-         string o_username, o_pass;
-
-
-         while (!login_file.eof())
-         {
-             login_file >> o_username >> o_pass;  // reads original username from the file
-             if (username == o_username)
-             {
-                 found = true;
-                 break;
-             }
-             login_file >> o_username >> o_pass;
-         }
-         login_file.close();
-
-         return found;
-     }
-     static bool is_valid_login_fdo(string username, string pass)
-     {
-         ifstream login_file(FILE_PATH + "fdo_login_details.txt");
-
-         bool logined = false;
-         string o_username, o_pass;
-
-
-         while (!login_file.eof())
-         {
-             login_file >> o_username >> o_pass; // reads original username from the file
-             if (username == o_username)
-             {
-                 pass = encrypt(username, pass);
-
-                 if (pass == o_pass)
-                 {
-                     logined = true;
-                     break;
-                 }
-             }
-         }
-         login_file.close();
-
-         return logined;
-     }
-     static void initiate_all_fdo(fdo*& fdos_list, int& fdo_count)
-     {
-         ifstream details_file(FILE_PATH + "fdo_details.csv");
-         int count = 0;
-         string line, word;
-         string fdo_details[15], v_details[6];
-         //string houseID limit total_vac_amount vaccineCount
-
-         cout << "ware\n";
-         while (getline(details_file, line))
-         {
-             cout << "fdo\n";
-             count = 0;
-             stringstream str(line);
-
-             while (getline(str, word, ','))
-             {
-                 cout << word << endl;
-                 fdo_details[count++] = word;
-             }
-
-             expand<fdo>(fdos_list, fdo_count);
-
-             fdos_list[fdo_count - 1].load_data(fdo_details[0], fdo_details[1], fdo_details[2], fdo_details[3], fdo_details[4], fdo_details[5], fdo_details[6], fdo_details[7], "0", fdo_details[9], fdo_details[10], fdo_details[11], fdo_details[12], fdo_details[13], fdo_details[14]);
-
-
-             for (int i = 0; i < stoi(fdo_details[8]); i++)
-             {
-                 count = 0;
-                 getline(details_file, line);
-                 stringstream str1(line);
-
-                 while (getline(str1, word, ','))
-                 {
-                     v_details[count++] = word;
-                 }
-
-                 fdos_list[fdo_count - 1].load_vaccine(v_details[0], v_details[1], v_details[2], v_details[3], v_details[4], v_details[5]);
-             }
-         }
-
-     }
-     static void add_new_fdo(fdo* obj)
-     {
-         ofstream details_file(FILE_PATH + "fdo_details.csv", ios::app);
-         ofstream login_file(FILE_PATH + "fdo_login_details.txt", ios::app);
-
-         if (!details_file || !login_file)
-         {
-             //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
-         }
-         else
-         {
-             details_file << obj->file_details();
-             login_file << obj->file_logindetails();
-
-             details_file.close();
-             login_file.close();
-         }
-     }
-     static void add_new_fdo_vaccine(string ID, fdo* fdoobj, vaccines* obj)
-     {
-         ifstream details_file(FILE_PATH + "fdo_details.csv");
-         ofstream temp(FILE_PATH + "temp.csv");
-
-         string line, word;
-
-         int count = 0;
-         string details[15];
-         //username firstname lastname email contactNumber CNIC vacCenterName, city vacCount doc_username firstname lastname email contactNumber CNIC
-
-         if (!details_file)
-         {
-             //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
-         }
-         else
-         {
-
-             while (getline(details_file, line))
-             {
-                 count = 0;
-                 stringstream str(line);
-                 while (getline(str, word, ','))
-                 {
-                     details[count++] = word;
-                 }
-
-                 if (details[0] != ID)
-                 {
-                     temp << line;
-
-                     if (line.size() != 0)
-                         if (line[line.size() - 1] != '\n')
-                             temp << "\n";
-
-                 }
-                 else
-                 {
-                     temp << fdoobj->file_details();
-                 }
-
-                 for (int i = 0; i < stoi(details[8]); i++)
-                 {
-                     getline(details_file, line);
-                     temp << line;
-
-                     if (line.size() != 0)
-                         if (line[line.size() - 1] != '\n')
-                             temp << "\n";
-                 }
-
-                 if (details[0] == ID)
-                 {
-
-                     temp << obj->file_details();
-                 }
-
-             }
-
-             details_file.close();
-             temp.close();
-
-             ofstream details_file("fdo_details.csv");
-             ifstream temp("temp.csv");
-
-             while (getline(temp, line))
-             {
-                 details_file << line;
-
-                 if (line.size() != 0)
-                     if (line[line.size() - 1] != '\n')
-                     {
-                         details_file << "\n"; //Pakistani tughe salaam :))
-                     }
-             }
-
-             details_file.close();
-             temp.close();
-         }
-     }
-     static void store_deleted_fdos(string username, fdo* arr, int size)
-     {
-         ofstream details_file(FILE_PATH + "fdo_details.csv");
-
-
-         if (!details_file)
-         {
-             //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
-         }
-         else
-         {
-             for (int i = 0; i < size; i++)
-             {
-                 details_file << arr[i].file_details();
-             }
-             details_file.close();
-         }
-
-         vector<string> o_username, o_pass;
-         string un, pass;
-         int count = 0;;
-
-         ifstream login_input_file(FILE_PATH + "fdo_login_details.txt");
-
-         while (!login_input_file.eof())
-         {
-             login_input_file >> un >> pass;
-             o_username.push_back(un);
-             o_pass.push_back(pass);
-             count++;
-         }
-         login_input_file.close();
-
-         ofstream login_output_file(FILE_PATH + "fdo_login_details.txt");
-
-         for (int i = 0; i < count; i++)
-         {
-             if (username != o_username[i])
-             {
-                 login_output_file << o_username[i] << " " << o_pass[i] << endl;
-             }
-         }
-
-         login_output_file.close();
-     }
-     static void store_updated_fdos(string username, fdo* arr, int size)
-     {
-         ofstream details_file(FILE_PATH + "fdo_details.csv");
-
-
-         if (!details_file)
-         {
-             //print_error("\n\nERROR IN OPENING THE FILE: fdo_details.csv or admin_login_details.txt\n\n");
-         }
-         else
-         {
-             for (int i = 0; i < size; i++)
-             {
-                 details_file << arr[i].file_details();
-             }
-             details_file.close();
-         }
-
-         vector<string> o_username, o_pass;
-         string un, pass;
-         int count = 0;;
-
-         ifstream login_input_file(FILE_PATH + "fdo_login_details.txt");
-
-         while (!login_input_file.eof())
-         {
-             login_input_file >> un >> pass;
-             o_username.push_back(un);
-             o_pass.push_back(pass);
-             count++;
-         }
-         login_input_file.close();
-
-         ofstream login_output_file(FILE_PATH + "fdo_login_details.txt");
-
-         for (int i = 0; i < count; i++)
-         {
-             if (username == o_username[i])
-             {
-                 login_output_file << arr[i].file_logindetails();
-             }
-             else
-             {
-                 login_output_file << o_username[i] << " " << o_pass[i] << endl;
-             }
-         }
-
-         login_output_file.close();
-     }
-
-     static bool find_gov_off(string username)
-     {
-         ifstream login_file(FILE_PATH + "gov_off_details.txt");
-
-         bool found = false;
-         string o_username, o_pass;
-
-
-         while (!login_file.eof())
-         {
-             login_file >> o_username >> o_pass;  // reads original username from the file
-             if (username == o_username)
-             {
-                 found = true;
-                 break;
-             }
-             login_file >> o_username >> o_pass;
-         }
-         login_file.close();
-
-         return found;
-     }
-     static bool is_valid_login_gov_off(string username, string pass)
-     {
-         ifstream login_file(FILE_PATH + "gov_off_login_details.txt");
-
-         bool logined = false;
-         string o_username, o_pass;
-
-
-         while (!login_file.eof())
-         {
-             login_file >> o_username >> o_pass; // reads original username from the file
-             if (username == o_username)
-             {
-                 pass = encrypt(username, pass);
-
-                 if (pass == o_pass)
-                 {
-                     logined = true;
-                     break;
-                 }
-             }
-         }
-         login_file.close();
-
-         return logined;
-     }
-     static void add_new_gov_off(gov_off* obj)
-     {
-         ofstream details_file(FILE_PATH + "gov_off_details.csv", ios::app);
-         ofstream login_file(FILE_PATH + "gov_off_login_details.txt", ios::app);
-
-         if (!details_file || !login_file)
-         {
-             //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
-         }
-         else
-         {
-             details_file << obj->file_details();
-             login_file << obj->file_logindetails();
-
-             details_file.close();
-             login_file.close();
-         }
-     }
-     static void store_deleted_gov_offs(string username, gov_off* arr, int size)
-     {
-         ofstream details_file(FILE_PATH + "gov_off_details.csv");
-
-
-         if (!details_file)
-         {
-             //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
-         }
-         else
-         {
-             for (int i = 0; i < size; i++)
-             {
-                 details_file << arr[i].file_details();
-             }
-             details_file.close();
-         }
-
-         vector<string> o_username, o_pass;
-         string un, pass;
-         int count = 0;;
-
-         ifstream login_input_file(FILE_PATH + "gov_off_login_details.txt");
-
-         while (!login_input_file.eof())
-         {
-             login_input_file >> un >> pass;
-             o_username.push_back(un);
-             o_pass.push_back(pass);
-             count++;
-         }
-         login_input_file.close();
-
-         ofstream login_output_file(FILE_PATH + "gov_off_login_details.txt");
-
-         for (int i = 0; i < count; i++)
-         {
-             if (username != o_username[i])
-             {
-                 login_output_file << o_username[i] << " " << o_pass[i] << endl;
-             }
-         }
-
-         login_output_file.close();
-     }
-     static void store_updated_gov_offs(string username, gov_off* arr, int size)
-     {
-         ofstream details_file(FILE_PATH + "gov_off_details.csv");
-
-
-         if (!details_file)
-         {
-             //print_error("\n\nERROR IN OPENING THE FILE: gov_off_details.csv or admin_login_details.txt\n\n");
-         }
-         else
-         {
-             for (int i = 0; i < size; i++)
-             {
-                 details_file << arr[i].file_details();
-             }
-             details_file.close();
-         }
-
-         vector<string> o_username, o_pass;
-         string un, pass;
-         int count = 0;;
-
-         ifstream login_input_file(FILE_PATH + "gov_off_login_details.txt");
-
-         while (!login_input_file.eof())
-         {
-             login_input_file >> un >> pass;
-             o_username.push_back(un);
-             o_pass.push_back(pass);
-             count++;
-         }
-         login_input_file.close();
-
-         ofstream login_output_file(FILE_PATH + "gov_off_login_details.txt");
-
-         for (int i = 0; i < count; i++)
-         {
-             if (username == o_username[i])
-             {
-                 login_output_file << arr[i].file_logindetails();
-             }
-             else
-             {
-                 login_output_file << o_username[i] << " " << o_pass[i] << endl;
-             }
-         }
-
-         login_output_file.close();
-     }
-
-     static void initiate_all_companies(company*& companies_list, int& companies_count)
-     {
-         ifstream details_file(FILE_PATH + "company_details.csv");
-         int count = 0;
-         string line, word;
-         string details[7];
-         //string cname LbNo vID vName NoDoses price, quantity;
-
-         while (getline(details_file, line))
-         {
-             count = 0;
-             stringstream str(line);
-
-             while (getline(str, word, ','))
-             {
-                 details[count++] = word;
-             }
-
-             expand<company>(companies_list, companies_count);
-
-             companies_list[companies_count - 1].load_data(details[0], details[1], details[2], details[3], details[4], details[5], details[6]);
-         }
-
-     }
-     static void add_new_company(company* obj)
-     {
-         ofstream details_file(FILE_PATH + "company_details.csv", ios::app);
-
-         if (!details_file)
-         {
-             //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
-         }
-         else
-         {
-             details_file << obj->file_details();
-
-             details_file.close();
-         }
-     }
-     static void store_companies(company* arr, int size)
-     {
-         ofstream details_file(FILE_PATH + "company_details.csv");
-
-
-         if (!details_file)
-         {
-             //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
-         }
-         else
-         {
-             for (int i = 0; i < size; i++)
-             {
-                 details_file << arr[i].file_details();
-             }
-             details_file.close();
-         }
-     }
-
-     static void initiate_all_warehouses(warehouse*& warehouses_list, int& warehouse_count)
-     {
-         ifstream details_file(FILE_PATH + "warehouse_details.csv");
-         int count = 0;
-         string line, word;
-         string w_details[4], v_details[6];
-         //string houseID limit total_vac_amount vaccineCount
-
-         cout << "ware\n";
-         while (getline(details_file, line))
-         {
-             cout << "warehouse\n";
-             count = 0;
-             stringstream str(line);
-
-             while (getline(str, word, ','))
-             {
-                 cout << word << endl;
-                 w_details[count++] = word;
-             }
-
-             expand<warehouse>(warehouses_list, warehouse_count);
-
-             warehouses_list[warehouse_count - 1].load_data(w_details[0], w_details[1], w_details[2], "0");
-         
-         
-             for (int i = 0; i < stoi(w_details[3]); i++)
-             {
-                 count = 0;
-                 getline(details_file, line);
-                 stringstream str1(line);
-
-                 while (getline(str1, word, ','))
-                 {
-                     v_details[count++] = word;
-                 }
-
-                 warehouses_list[warehouse_count - 1].load_vaccine(v_details[0], v_details[1], v_details[2], v_details[3], v_details[4], v_details[5]);
-             }
-         }
-
-     }
-     static void add_new_warehouse(warehouse* obj)
-     {
-         ofstream details_file(FILE_PATH + "warehouse_details.csv", ios::app);
-
-         if (!details_file)
-         {
-             //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
-         }
-         else
-         {
-             details_file << obj->file_details();
-
-             details_file.close();
-         }
-     }
-     static void add_new_warehouse_vaccine(string ID,warehouse* wareobj, vaccines* obj)
-     {
-         ifstream details_file(FILE_PATH + "warehouse_details.csv");
-         ofstream temp(FILE_PATH + "temp.csv");
-
-         string line;
-         string warehouseID, limit, vacamt, vacCount;
-
-         if (!details_file)
-         {
-             //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
-         }
-         else
-         {
-             
-             while (getline(details_file, line))
-             {
-                 stringstream str(line);
-                 getline(str, warehouseID, ',');
-                 getline(str, limit, ',');
-                 getline(str, vacamt, ',');
-                 getline(str, vacCount, ',');
-
-                 if (warehouseID != ID)
-                 {
-                    temp << line;
-                    
-                    if (line.size() != 0)
-                    if (line[line.size() - 1] != '\n')
-                        temp << "\n";
-                    
-                 }
-                 else
-                 {
-                     temp << wareobj->file_details();
-                 }
-
-                 for (int i = 0; i < stoi(vacCount); i++)
-                 {
-                     getline(details_file, line);
-                     temp << line;
-                     
-                     if(line.size() != 0)
-                     if (line[line.size() - 1] != '\n')
-                         temp << "\n";
-                 }
-
-                 if (warehouseID == ID)
-                 {
-
-                     temp << obj->file_details();
-                 }
-                 
-             }
-
-             details_file.close();
-             temp.close();
-
-             ofstream details_file("warehouse_details.csv");
-             ifstream temp("temp.csv");
-
-             while (getline(temp, line))
-             {
-                 details_file << line;
-
-                 if (line.size() != 0)
-                 if (line[line.size() - 1] != '\n')
-                 {
-                     details_file << "\n"; //Pakistani tughe salaam :))
-                 }
-             }
-
-             details_file.close();
-             temp.close();
-         }
-     }
-     static void delete_warehouse_vaccine(string ID, warehouse* obj, string vID, string bID)
-     {
-         ifstream details_file(FILE_PATH + "warehouse_details.csv");
-         ofstream temp(FILE_PATH + "temp.csv");
-
-         string line;
-         string warehouseID, limit, vacamt, vacCount;
-         string vacID, batchID;
-
-         if (!details_file)
-         {
-             //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
-         }
-         else
-         {
-
-             while (getline(details_file, line))
-             {
-                 stringstream str(line);
-                 getline(str, warehouseID, ',');
-                 getline(str, limit, ',');
-                 getline(str, vacamt, ',');
-                 getline(str, vacCount, ',');
-
-                 
-
-                 if (warehouseID == ID)
-                 {
-                     temp << obj->file_details();
-                     for (int i = 0; i < stoi(vacCount); i++)
-                     {
-                         getline(details_file, line);
-
-                         stringstream str1(line);
-                         getline(str1, vacID, ',');
-                         getline(str1, batchID, ',');
-
-                         if (vID != vacID || bID != batchID)
-                         {
-                             temp << line;
-
-                             if (line.size() != 0)
-                                 if (line[line.size() - 1] != '\n')
-                                     temp << "\n";
-                         }
-
-                     }
-                 }
-                 else
-                 {
-                     temp << line;
-                     if (line.size() != 0)
-                         if (line[line.size() - 1] != '\n')
-                             temp << "\n";
-
-                     for (int i = 0; i < stoi(vacCount); i++)
-                     {
-                         getline(details_file, line);
-                         temp << line;
-
-                         if (line.size() != 0)
-                             if (line[line.size() - 1] != '\n')
-                                 temp << "\n";
-                     }
-                 }
-
-             }
-
-             details_file.close();
-             temp.close();
-
-             ofstream details_file("warehouse_details.csv");
-             ifstream temp("temp.csv");
-
-             while (getline(temp, line))
-             {
-                 details_file << line;
-
-                 if (line.size() != 0)
-                     if (line[line.size() - 1] != '\n')
-                         details_file << "\n";
-             }
-
-             details_file.close();
-             temp.close();
-         }
-     }
-
-
-     static bool find_citizen(string CNIC)
-     {
-         ifstream details_file(FILE_PATH + "citizen_details.csv");
-
-         int count = 0;
-         string line, word;
-         string details[9];
-         //string un fn ln em cn No Age bT City
-
-         while (getline(details_file, line))
-         {
-             count = 0;
-             stringstream str(line);
-
-             while (getline(str, word, ','))
-             {
-                 details[count++] = word;
-             }
-
-             if (CNIC == details[4])
-             {
-                 return true;
-             }
-         }
-
-         return false;
-     }
-     static bool already_vacinated(string CNIC)
-     {
-         ifstream details_file(FILE_PATH + "citizen_vac.csv");
-         string line, word;
-         string c, vac, is_vac;
-         while (getline(details_file, line))
-         {
-             
-             stringstream str(line);
-             getline(str, c, ',');
-             getline(str, vac, ',');
-             getline(str, is_vac, ',');
-             
-
-             if (CNIC == c && is_vac == "yes")
-             {
-                 return true;
-             }
-         }
-
-         return false;
-     }
-     static void add_new_citizen(citizen* obj)
-     {
-         ofstream details_file(FILE_PATH + "citizen_details.csv", ios::app);
-
-         if (!details_file)
-         {
-             print_error("\n\nERROR IN OPENING THE FILE: citizen_details.csv\n\n");
-         }
-         else
-         {
-             details_file << obj->file_details();
-
-             details_file.close();
-         }
-     }
-     static citizen load_citizen(string CNIC)
-     {
-         ifstream details_file(FILE_PATH + "citizen_details.csv");
-
-         int count = 0;
-         string line, word;
-         string details[9];
-         //string un fn ln em cn No Age bT City
-
-         while (getline(details_file, line))
-         {
-             count = 0;
-             stringstream str(line);
-
-             while (getline(str, word, ','))
-             {
-                 details[count++] = word;
-             }
-
-             if (CNIC == details[4])
-             {
-                 return citizen(details[0], details[1], details[2], details[3], details[4], details[5], details[6], details[7], details[8]);
-             }
-         }
-
-     }
-     static void store_vac_citizen(string cnic, string vacID)
-     {
-         ofstream details_file(FILE_PATH + "citizen_vac.csv", ios::app);
-
-         details_file << cnic + "," + vacID + ",yes,\n";
-
-         details_file.close();
-     }
+     static bool find_super_admin(string username);
+     static bool is_valid_login_super_admin(string username, string pass);
+     static super_admin* login_super_admin(string username);
+
+     static bool find_admin(string username);
+     static bool is_valid_login_admin(string username, string pass);
+
+     static void initiate_all_admin(admin*& admin_list, int& admin_count);
+
+     static void add_new_admin(admin* obj);
+     static void store_deleted_admins(string username, admin* arr, int size);
+     static void store_updated_admins(string username, admin* arr, int size);
+
+     static bool find_doctor(string username);
+     static bool is_valid_login_doctor(string username, string pass);
+     static void add_new_doctor(doctor* obj);
+     static void store_deleted_doctors(string username, doctor* arr, int size);
+     static void store_updated_doctors(string username, doctor* arr, int size);
+
+     static bool find_fdo(string username);
+     static bool is_valid_login_fdo(string username, string pass);
+     static void initiate_all_fdo(fdo*& fdos_list, int& fdo_count);
+     static void add_new_fdo(fdo* obj);
+     static void add_new_fdo_vaccine(string ID, fdo* fdoobj, vaccines* obj);
+     static void store_deleted_fdos(string username, fdo* arr, int size);
+     static void store_updated_fdos(string username, fdo* arr, int size);
+
+     static bool find_gov_off(string username);
+     static bool is_valid_login_gov_off(string username, string pass);
+     static void initiate_all_gov_off(gov_off*& gov_off_list, int& gov_off_count);
+     static void add_new_gov_off(gov_off* obj);
+     static void store_deleted_gov_offs(string username, gov_off* arr, int size);
+     static void store_updated_gov_offs(string username, gov_off* arr, int size);
+
+     static void initiate_all_companies(company*& companies_list, int& companies_count);
+     static void add_new_company(company* obj);
+     static void store_companies(company* arr, int size);
+
+     static void initiate_all_warehouses(warehouse*& warehouses_list, int& warehouse_count);
+     static void add_new_warehouse(warehouse* obj);
+     static void add_new_warehouse_vaccine(string ID, warehouse* wareobj, vaccines* obj);
+     static void delete_warehouse_vaccine(string ID, warehouse* obj, string vID, string bID);
+
+
+     static bool find_citizen(string CNIC);
+     static bool already_vacinated(string CNIC);
+     static void add_new_citizen(citizen* obj);
+     static citizen load_citizen(string CNIC);
+     static void store_vac_citizen(string cnic, vaccines* vac);
+     static void reduce_vac_doses(string cnic);
+     static int get_remaining_doses(string cnic);
+     static string get_citizen_vacID(string cnic);
+
+
+     static int get_num_registered_citizens();
+     static int get_num_vacinated();
+     static int get_num_partially_vacinated();
+     static bool display_citizen_with_VacID(string ID);
+     static bool display_num_vacinated();
+     static bool display_num_partially_vacinated();
      
 
  };
+
+ //------------------------ PERSON DEFINATIONS------------------------------------------------------------------
+
+ person::person()
+ {
+     username = pass = firstname = lastname = email = contactNumber = CNIC = " ";
+
+ }
+ person::person(string un, string fn, string ln, string em, string cn, string No) :username(un), firstname(fn), lastname(ln), email(em), CNIC(cn), contactNumber(No) {}
+ void person::input()
+ {
+
+     cout << "Enter First Name: ";
+     do
+     {
+         cin >> firstname;
+         if (!is_valid_name(firstname))
+         {
+             print_error("\n[!] ERROR: The name should only have alphabets.\n\n");
+             cout << "Enter again: ";
+         }
+     } while (!is_valid_name(firstname));
+
+     cout << "Enter last Name: ";
+     do
+     {
+         cin >> lastname;
+         if (!is_valid_name(lastname))
+         {
+             print_error("\n[!] ERROR: The name should only have alphabets.\n\n");
+             cout << "Enter again: ";
+         }
+     } while (!is_valid_name(lastname));
+
+     cout << "Enter Email Address: ";
+     do
+     {
+         cin >> email;
+         if (!is_valid_email(email))
+         {
+             print_error("\n[!] ERROR: The email entered in not valid.\n\n");
+             cout << "Enter again: ";
+         }
+     } while (!is_valid_email(email));
+
+     cout << "Enter CNIC: ";
+
+     do
+     {
+         cin >> CNIC;
+         if (!is_valid_cnic(CNIC))
+         {
+             print_error("\n[!] ERROR: The CNIC entered in not valid.\n\n");
+             cout << "Enter again: ";
+         }
+     } while (!is_valid_cnic(CNIC));
+
+     cout << "Enter Contact Number: ";
+     do
+     {
+         cin >> contactNumber;
+         if (!is_valid_contact(contactNumber))
+         {
+             print_error("\n[!] ERROR: The phone number entered in not valid.\n\n");
+             cout << "Enter again: ";
+         }
+     } while (!is_valid_contact(contactNumber));
+
+
+
+ }
+ void person::output()
+ {
+     cout << "First Name: " << firstname << endl;
+     cout << "last Name: " << lastname << endl;
+     cout << "Email Address: " << email << endl;
+     cout << "Contact Number: " << contactNumber << endl;
+     cout << "CNIC: " << CNIC << endl;
+ }
+ bool person::compare_username(string un)
+ {
+     if (username == un)
+     {
+         return true;
+     }
+     else
+     {
+         return false;
+     }
+ }
+ string person::file_details()
+ {
+     return  username + "," + firstname + "," + lastname + "," + email + "," + CNIC + "," + contactNumber + ",";
+ }
+ string person::file_logindetails()
+ {
+     return username + " " + pass + "\n";
+ }
+ void person::load_person_data(string un, string fn, string ln, string em, string cn, string No)
+ {
+     username = un;
+     firstname = fn;
+     lastname = ln;
+     email = em;
+     CNIC = cn;
+     contactNumber = No;
+ }
+ //----------------------------------------------------------------------------------------------------------------
 
  //-------------------------SUPER ADMIN DEFINATIONS------------------------------------------------------------------
      super_admin::super_admin(string un, string fn, string ln, string em, string cn, string No) : person(un, fn, ln, em, cn, No)
@@ -2285,7 +833,10 @@ public:
         
         Filing::initiate_all_admin(admin_list, admin_count);
         Filing::initiate_all_fdo(fdo_list, fdo_count);
+        Filing::initiate_all_gov_off(gov_off_list, gov_off_count);
      }
+
+
      int super_admin::find_admin_index(string un)
      {
          for (int i = 0; i < admin_count; i++)
@@ -2342,6 +893,34 @@ public:
              self_instance = new super_admin(un, fn, ln, em, cn, No);
 
          return self_instance;
+     }
+
+     admin* super_admin::admin_obj(string un)
+     {
+         int i = find_admin_index(un);
+         if (i != -1)
+         {
+             return &admin_list[i];
+         }
+
+     }
+     fdo* super_admin::fdo_obj(string un)
+     {
+         int i = find_fdo_index(un);
+         if (i != -1)
+         {
+             return &fdo_list[i];
+         }
+
+     }
+     gov_off* super_admin::gov_off_obj(string un)
+     {
+         int i = find_gov_off_index(un);
+         if (i != -1)
+         {
+             return &gov_off_list[i];
+         }
+
      }
 
      void super_admin::create_admin()
@@ -2490,6 +1069,7 @@ public:
          expand<fdo>(fdo_list, fdo_count);
 
          fdo_list[fdo_count - 1].input_login_details();
+         cout << "\n";
          fdo_list[fdo_count - 1].fdo_input();
 
          Filing::add_new_fdo(&fdo_list[fdo_count - 1]);
@@ -2561,6 +1141,7 @@ public:
          expand<gov_off>(gov_off_list, gov_off_count);
 
          gov_off_list[gov_off_count - 1].input_login_details();
+         cout << "\n";
          gov_off_list[gov_off_count - 1].input();
 
          Filing::add_new_gov_off(&gov_off_list[gov_off_count - 1]);
@@ -2617,9 +1198,32 @@ public:
          }
 
      }
+     void super_admin::display_gov_off()
+     {
+         for (int i = 0; i < gov_off_count; i++)
+         {
+             gov_off_list[i].output();
+             cout << "\n";
+         }
+     }
      void super_admin::input_login_details() {}
 
- super_admin* super_admin::self_instance = nullptr; // initialization
+     bool super_admin::does_vac_center_exists_in(string c)
+     {
+         for (int i = 0; i < fdo_count; i++)
+         {
+             if (fdo_list[i].compare_city(c))
+             {
+                 return true;
+             }
+
+         }
+
+         return false;
+
+     }
+
+    super_admin* super_admin::self_instance = nullptr; // initialization
 
 
  //----------------------------------------------------------------------------------------------------------------
@@ -2885,12 +1489,12 @@ public:
         do
         {
             cin >> city;
-            if (admin::does_vac_center_exists_in(city))
+            if (super_admin::does_vac_center_exists_in(city))
             {
                 print_error("\n[!] ERROR: The vaccine center already exists.\n");
-                cout << "Enter again: ";
+                cout << "\nEnter again: ";
             }
-        } while (admin::does_vac_center_exists_in(city));
+        } while (super_admin::does_vac_center_exists_in(city));
 
         cout << "\n\n->Doctor Details\n\n";
         doc->input();
@@ -3028,9 +1632,10 @@ public:
 
         if (Filing::find_citizen(cnic))
         {
+            citizen ctz = Filing::load_citizen(cnic);
+
             if (!Filing::already_vacinated(cnic))
             {
-                citizen ctz = Filing::load_citizen(cnic);
 
                 if (ctz.get_eligibity())
                 {
@@ -3060,9 +1665,13 @@ public:
                             }
                         } while (i > vacCount || i < 0);
 
-                        Filing::store_vac_citizen(cnic, vac_list[i-1].get_vacID());
+                        Filing::store_vac_citizen(cnic, &vac_list[i-1]);
 
-                        cout << "\n\nYOU HAVE BEEN VACCINATED !\n\n";
+                        cout << "\n\nYOU HAVE RECEIVED YOUR DOSE !\n\n";
+                    }
+                    else
+                    {
+                        print_error("\n[!] ERROR: Your vitals are safe for vaccination.\n\n");
                     }
                 }
                 else
@@ -3072,8 +1681,38 @@ public:
             }
             else
             {
-                print_error("\n[!] ERROR: You have already vaccinated\n\n");
+                if (Filing::get_remaining_doses(cnic) != 0)
+                {
+                    cout << "\n\n->CITIZEN INFO\n\n";
+                    ctz.citizen_output();
+
+                    cout << "->DOCTOR PORTAL\n\n";
+                    if (doc->is_health_ok())
+                    {
+                        cout << "\nYour health condition is OK for the vaccination process\n\n";
+
+                        string vacID = Filing::get_citizen_vacID(cnic);
+
+                        cout << "\nVaccine ID: " << vacID << endl;
+
+                        cout << "\n\nYOU HAVE RECEIVED YOUR DOSE !\n\n";
+                        Filing::reduce_vac_doses(cnic);
+                    }
+                    else
+                    {
+                        print_error("\n[!] ERROR: Your vitals are safe for vaccination.\n\n");
+                    }
+                }
+                else
+                {
+                    print_error("\n[!] ERROR: You are fully vaccinated\n\n");
+                }
+
             }
+        }
+        else
+        {
+            print_error("\n[!] ERROR: You are not registered\n\n");
         }
     }
 
@@ -3129,6 +1768,7 @@ public:
         username = un;
         pass = encrypt(un, p);
     }
+//----------------------------------------------------------------------------------------------------------------
 
 //------------------------ WAREHOUSE DEFINATIONS------------------------------------------------------------------
 
@@ -3144,3 +1784,2100 @@ public:
         Filing::delete_warehouse_vaccine(houseID, this, vacID, to_string(batchID));
 
     }
+    bool warehouse::is_enough_space(int x)
+    {
+        return (limit - total_vac_amount) >= x;
+    }
+    warehouse::warehouse()
+    {
+        total_vac_amount = vaccineCount = 0;
+    }
+
+    void warehouse::houseInput()
+    {
+        cout << "Enter Warehouse ID: ";
+        cin >> houseID;
+        cout << "Enter Storage capacity: ";
+        cin >> limit;
+
+    }
+
+    void warehouse::houseOutput()
+    {
+        cout << "Warehouse ID: " << houseID << endl;
+        cout << "Current Vaccine amount: " << total_vac_amount << endl;
+        cout << "Storage limit: " << limit << endl;
+        cout << "No of batches available: " << vaccineCount << endl;
+    }
+
+    void warehouse::vaccinesOutput()
+    {
+        for (int i = 0; i < vaccineCount; i++)
+        {
+            cout << "\n";
+            vac_ware[i].vaccineOutput(true);
+        }
+    }
+
+    void warehouse::load_vaccine(string vID, string lbatch, string vName, string NoDoses, string price, string quantity)
+    {
+        expand<vaccines>(vac_ware, vaccineCount);
+
+        vac_ware[vaccineCount - 1].load_data(vID, vName, NoDoses, price, quantity);
+        vac_ware[vaccineCount - 1].set_batchNo(stoi(lbatch));
+    }
+
+    vaccines* warehouse::get_vaccine(int i)
+    {
+        return &vac_ware[i];
+    }
+
+    void warehouse::add_new_vaccine(vaccines* v, int lbatch)
+    {
+        string vID = v->get_vacID();
+        string vName = v->get_vacName();
+        string NoDoses = to_string(v->get_Nofdoses());
+        string price = to_string(v->get_price());
+        string quantity = to_string(v->get_quantity());
+
+        expand<vaccines>(vac_ware, vaccineCount);
+
+        vac_ware[vaccineCount - 1].load_data(vID, vName, NoDoses, price, quantity);
+        vac_ware[vaccineCount - 1].set_batchNo(lbatch);
+
+        total_vac_amount += v->get_quantity();
+    }
+
+    string warehouse::file_details()
+    {
+        return houseID + "," + to_string(limit) + "," + to_string(total_vac_amount) + "," + to_string(vaccineCount) + ",\n";
+    }
+
+    void warehouse::load_data(string id, string l, string vac_amt, string vacC)
+    {
+        houseID = id;
+        limit = stoi(l);
+        total_vac_amount = stoi(vac_amt);
+        vaccineCount = stoi(vacC);
+    }
+
+    bool warehouse::compare_warehouseID(string n)
+    {
+        return n == houseID;
+    }
+
+    int warehouse::find_valid_vacID_batchID(string vID, int bID)
+    {
+        for (int i = 0; i < vaccineCount; i++)
+        {
+            if (vID == vac_ware[i].get_vacID() && bID == vac_ware[i].get_batchNo())
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+    //----------------------------------------------------------------------------------------------------------------
+
+    //------------------------ DOCTOR DEFINATIONS------------------------------------------------------------------
+    doctor::doctor()
+    {
+        username = "doctor";
+    }
+    bool doctor::is_health_ok()
+    {
+        int bloodPressure, OxyLvl, GlucoseLvl;
+
+        cout << "Enter Blood Pressure: ";
+        bloodPressure = safe_input<int>();
+        cout << "Enter Oxygen Level: ";
+        OxyLvl = safe_input<int>();
+        cout << "Enter GlucoseLvl: ";
+        GlucoseLvl = safe_input<int>();
+
+        if (bloodPressure <= 120 && OxyLvl >= 95 && GlucoseLvl >= 70 && GlucoseLvl <= 100)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    //----------------------------------------------------------------------------------------------------------------
+
+    //------------------------ COMPANY DEFINATIONS------------------------------------------------------------------
+    company::company()
+    {
+        vac = new vaccines;
+        lastBatchNo = 0;
+    }
+    void company::companyInput() //admin can add companies
+    {
+        cout << "Enter company name: ";
+        cin >> companyName;
+
+        vac->vaccineInput();
+    }
+    void company::companyoutput() //review company details
+    {
+        cout << "Company Name: " << companyName << endl;
+        vac->vaccineOutput();
+    }
+
+    vaccines* company::get_vac()
+    {
+        return vac;
+    }
+    int company::get_vac_quantity()
+    {
+        return vac->get_quantity();
+    }
+
+    string company::file_details()
+    {
+        return companyName + "," + to_string(lastBatchNo) + "," + vac->get_vacID() + "," + vac->get_vacName() + "," + to_string(vac->get_Nofdoses()) + "," + to_string(vac->get_price()) + "," + to_string(vac->get_quantity()) + ",\n";
+    }
+
+    bool company::compare_companyName(string n)
+    {
+        return n == companyName;
+    }
+
+    void company::load_data(string cname, string LbNo, string vID, string vName, string NoDoses, string price, string quantity)
+    {
+        companyName = cname;
+        lastBatchNo = stoi(LbNo);
+        vac->load_data(vID, vName, NoDoses, price, quantity);
+    }
+
+    int company::get_batchID()
+    {
+        lastBatchNo++;
+        return lastBatchNo;
+    }
+    //----------------------------------------------------------------------------------------------------------------
+
+    
+    //------------------------ VACCINES DEFINATIONS------------------------------------------------------------------
+    void vaccines::vaccineInput()
+    {
+        cout << "Vaccine ID: ";
+        cin >> vaccineID;
+        cout << "Enter Vaccine Name: ";
+        getline(cin >>ws, vaccineName);
+        cout << "Enter no of doses: ";
+        do
+        {
+            Nofdoses = safe_input<int>();
+            if (Nofdoses <= 0)
+            {
+                print_error("\n[!] ERROR: The number of doses must be greater than zero.\n\n");
+                cout << "Enter again: ";
+            }
+
+        } while (Nofdoses <= 0);
+
+        cout << "Enter the price of vaccine: ";
+        do
+        {
+            price = safe_input<int>();
+            if (price <= 0)
+            {
+                print_error("\n[!] ERROR: The price must be greater than zero.\n\n");
+                cout << "Enter again: ";
+            }
+
+        } while (price <= 0);
+
+        cout << "Enter the quantity of vaccine: ";
+        do
+        {
+            quantity = safe_input<int>();
+            if (quantity <= 0)
+            {
+                print_error("\n[!] ERROR: The quantity must be greater than zero.\n\n");
+                cout << "Enter again: ";
+            }
+
+        } while (quantity <= 0);
+    }
+    void vaccines::vaccineOutput(bool bNO) // bNO tells wheter to print BatchNo or not
+    {
+        cout << "Vaccine ID: " << vaccineID << endl;
+        cout << "Vaccine Name: " << vaccineName << endl;
+        cout << "No. of doses: " << Nofdoses << endl;
+        cout << "Price of vaccine: " << price << endl;
+        cout << "Quantity of vaccine: " << quantity << endl;
+        if (bNO)
+            cout << "BatchID: " << batchNo << endl;
+    }
+
+    string vaccines::file_details()
+    {
+        return vaccineID + "," + to_string(batchNo) + "," + vaccineName + "," + to_string(Nofdoses) + "," + to_string(price) + "," + to_string(quantity) + ",\n";
+    }
+    void vaccines::load_data(string vID, string vName, string NoDoses, string p, string q)
+    {
+        vaccineID = vID;
+        vaccineName = vName;
+        Nofdoses = stoi(NoDoses);
+        price = stoi(p);
+        quantity = stoi(q);
+    }
+    void vaccines::set_batchNo(int num)
+    {
+        batchNo = num;
+    }
+
+    void vaccines::set_quantity(int q)
+    {
+        quantity = q;
+    }
+
+    int vaccines::get_batchNo()
+    {
+        return batchNo;
+    }
+
+    string vaccines::get_vacName()
+    {
+        return vaccineName;
+    }
+
+    string vaccines::get_vacID()
+    {
+        return vaccineID;
+    }
+
+    int vaccines::get_Nofdoses()
+    {
+        return Nofdoses;
+    }
+    int vaccines::get_price()
+    {
+        return price;
+    }
+
+    int vaccines::get_quantity()
+    {
+        return quantity;
+    }
+    //----------------------------------------------------------------------------------------------------------------
+
+
+    //------------------------ GOVERNMENT OFFICIAL DEFINATIONS------------------------------------------------------------------
+    void gov_off::input_login_details() {
+        string un, un_num, p;
+        bool correct_input = false;
+
+        while (!correct_input)
+        {
+            try
+            {
+                un = "GO";
+                cout << "Enter the username: GO";
+                cin >> un_num;
+
+                if (!regex_match(un_num, valid_user_num))
+                {
+                    throw invalid_username();
+                }
+
+                un += un_num; // concats the digits with "GO"
+
+                if (Filing::find_gov_off(un))
+                {
+                    throw username_exists();
+                }
+
+                cout << "\nEnter the password: ";
+                cin >> p;
+
+                if (!is_valid_password(p))
+                {
+                    throw invalid_password();
+                }
+
+                correct_input = true;
+            }
+            catch (const exception& e)
+            {
+                SetConsoleTextAttribute(h, 252);
+                print_spaces();
+                cout << "[!] Exception: " << e.what() << endl;
+                SetConsoleTextAttribute(h, 240);
+            }
+        }
+
+        username = un;
+        pass = encrypt(un, p);
+
+
+    }
+    void gov_off::load_gov_off_data(string un, string fn, string ln, string em, string cn, string No)
+    {
+        load_person_data(un, fn, ln, em, cn, No);
+    }
+    void gov_off::percentage_vac_population()
+    {
+        double total_population = Filing::get_num_registered_citizens();
+        double vac_population = Filing::get_num_vacinated();
+
+        double vac_percentage = (vac_population / total_population) * 100.0;
+
+        cout << "Total registered population: " << total_population << endl;
+        cout << "Total vaccinated population: " << vac_population << endl;
+
+        cout << "\nThe percentage of vaccinated population: " << vac_percentage << endl;
+        cout << "\n\n";
+    }
+    void gov_off::percentage_partially_vac_population()
+    {
+        double total_population = Filing::get_num_registered_citizens();
+        double partially_vac_population = Filing::get_num_partially_vacinated();
+
+        double partially_vac_percentage = (partially_vac_population / total_population) * 100.0;
+
+        cout << "Total registered population: " << total_population << endl;
+        cout << "Total vaccinated population: " << partially_vac_population << endl;
+
+        cout << "\nThe percentage of partially vaccinated population: " << partially_vac_percentage << endl;
+        cout << "\n\n";
+    }
+    void gov_off::display_vac_population()
+    {
+        
+        if (!Filing::display_num_vacinated())
+        {
+            print_error("\n[!] ERROR: There are no fully vacinated citizens.\n\n");
+        }
+    }
+    void gov_off::display_partially_vac_population()
+    {
+        if (!Filing::display_num_partially_vacinated())
+        {
+            print_error("\n[!] ERROR: There are no partially vacinated citizens.\n\n");
+        }
+    }
+    void gov_off::display_citizen_with_VacID()
+    {
+        string ID;
+        
+        cout << "\nEnter the Vaccine ID: ";
+        cin >> ID;
+
+        if (!Filing::display_citizen_with_VacID(ID))
+        {
+            print_error("\n[!] ERROR: There vacinated citizens with the following vaccine ID.\n\n");
+        }
+    }
+    void gov_off::display_graph()
+    {
+        double total_population = Filing::get_num_registered_citizens();
+        double vac_population = Filing::get_num_vacinated();
+        double partially_vac_population = Filing::get_num_partially_vacinated();
+
+        int partially_vac_percentage = (partially_vac_population / total_population) * 100.0;
+        int vac_percentage = (vac_population / total_population) * 100.0;
+
+        cout << "\nThe percentage of vaccinated population: " << vac_percentage << "%" << endl;
+        cout << "\nThe percentage of partially vaccinated population: " << partially_vac_percentage << "%" << endl;
+
+        const int chart_height = 20;
+        const int max_count = 100;
+        int arr[2] = { vac_percentage, partially_vac_percentage };
+        int max = 100;
+
+        cout << "\n\n";
+        for (int current_height = chart_height; current_height >= 0; --current_height)
+        {
+            for (int i = 0; i < 2; i++)
+            {
+                const int bar_height = (arr[i] * chart_height) / max_count;
+                int values = (max * chart_height) / max_count;
+
+                if (values == current_height && i == 0)
+                {
+                    cout << setw(5) << setfill(' ') << max << "%";
+                    max -= 10;
+                }
+                else if (i == 0)
+                {
+                    cout << "      ";
+                }
+
+                if (bar_height < current_height)
+                    std::cout << "                         "; // we're still above the bar
+                else if (bar_height == current_height)
+                    std::cout << "            _            "; // reached the top of the bar
+                else // bar_height > current_height
+                    std::cout << "           | |           "; // now the rest of the bar ...
+            }
+            cout << '\n';
+        }
+        cout << "\n\t   Fully Vaccinated \t  Partially Vaccinated\n\n";
+
+    }
+    //----------------------------------------------------------------------------------------------------------------
+
+    //------------------------ CITIZEN DEFINATIONS------------------------------------------------------------------
+    citizen::citizen()
+    {
+        username = "NULL";
+        is_eligible = true;
+    }
+
+    citizen::citizen(string un, string fn, string ln, string em, string cn, string No, string Age, string bT, string City)
+    {
+
+        is_eligible = true;
+        load_person_data("NULL", fn, ln, em, cn, No);
+        age = stoi(Age);
+        bloodType = bT;
+        city = City;
+
+        if (age < 5)
+        {
+            is_eligible = false;
+        }
+    }
+    void citizen::citizen_input()
+    {
+        input();
+
+        cout << "Enter age: ";
+        do
+        {
+            cin >> age;
+            if (age <= 0)
+            {
+                print_error("\n[!] ERROR: The age entered in not valid.\n\n");
+                cout << "Enter again: ";
+            }
+        } while (age <= 0);
+
+        if (age < 5)
+        {
+            is_eligible = false;
+        }
+
+        cout << "Enter blood type: ";
+        do
+        {
+            cin >> bloodType;
+            if (!is_valid_blood_group(bloodType))
+            {
+                print_error("\n[!] ERROR: The blood group entered in not valid.\n\n");
+                cout << "Enter again: ";
+            }
+
+        } while (!is_valid_blood_group(bloodType));
+
+        cout << "Enter city: ";
+        cin >> city;
+    }
+
+    void citizen::citizen_output()
+    {
+        output();
+        cout << "Age: " << age << endl;
+        cout << "Blood Group: " << bloodType << endl;
+        cout << "City: " << city << endl;
+    }
+
+    bool citizen::get_eligibity()
+    {
+        return is_eligible;
+    }
+
+    string citizen::file_details()
+    {
+        return person::file_details() + to_string(age) + "," + bloodType + "," + city + ",\n";
+    }
+
+    void citizen::load_citizen(string un, string fn, string ln, string em, string cn, string No, string Age, string bT, string City)
+    {
+        load_person_data(un, fn, ln, em, cn, No);
+        age = stoi(Age);
+        bloodType = bT;
+        city = City;
+
+        if (age < 5)
+        {
+            is_eligible = false;
+        }
+    }
+    //----------------------------------------------------------------------------------------------------------------
+
+
+    //------------------------ FILING DEFINATIONS------------------------------------------------------------------
+    bool Filing::find_super_admin(string username)
+    {
+        ifstream login_file(FILE_PATH + "super_admin_login_details.txt");
+        string o_username;
+
+        login_file >> o_username; // reads original username from the file
+
+
+        if (username == o_username)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    bool Filing::is_valid_login_super_admin(string username, string pass)
+    {
+        ifstream login_file(FILE_PATH + "super_admin_login_details.txt");
+        string o_username, o_pass;
+        int key = 0;
+
+        login_file >> o_username >> o_pass; // reads original username and password from the file
+
+        pass = encrypt(username, pass);
+
+        if (username == o_username && pass == o_pass)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+
+    }
+    super_admin* Filing::login_super_admin(string username)
+    {
+        ifstream details_file(FILE_PATH + "super_admin_details.csv");
+        int count = 0;
+        string line, word;
+        string details[6];
+        //string o_username, fn, ln, em, cn, No;
+
+        getline(details_file, line);
+        stringstream str(line);
+
+        while (getline(str, word, ','))
+        {
+            details[count++] = word;
+        }
+
+        if (details[0] == username)
+        {
+            return super_admin::getInstance(details[0], details[1], details[2], details[3], details[4], details[5]);
+        }
+    }
+
+    bool Filing::find_admin(string username)
+    {
+        ifstream login_file(FILE_PATH + "admin_login_details.txt");
+
+        bool found = false;
+        string o_username, o_pass;
+
+        // reads original username from the file
+        while (!login_file.eof())
+        {
+            login_file >> o_username >> o_pass;
+            if (username == o_username)
+            {
+                found = true;
+                break;
+            }
+
+        }
+        login_file.close();
+
+        return found;
+    }
+    bool Filing::is_valid_login_admin(string username, string pass)
+    {
+        ifstream login_file(FILE_PATH + "admin_login_details.txt");
+
+        bool logined = false;
+        string o_username, o_pass;
+
+        // reads original username from the file
+        while (!login_file.eof())
+        {
+            login_file >> o_username >> o_pass;
+            if (username == o_username)
+            {
+                pass = encrypt(username, pass);
+
+                if (pass == o_pass)
+                {
+                    logined = true;
+                    break;
+                }
+            }
+
+        }
+        login_file.close();
+
+        return logined;
+    }
+
+    void Filing::initiate_all_admin(admin*& admin_list, int& admin_count)
+    {
+        ifstream details_file(FILE_PATH + "admin_details.csv");
+        int count = 0;
+        string line, word;
+        string details[7];
+        //string o_username, fn, ln, em, cn, No, tprice;
+
+        while (getline(details_file, line))
+        {
+            count = 0;
+            stringstream str(line);
+
+            while (getline(str, word, ','))
+            {
+                details[count++] = word;
+            }
+            //cout << details[0] << endl;
+            //cout << admin_count << endl;
+            expand<admin>(admin_list, admin_count);
+
+            admin_list[admin_count - 1].load_admin_data(details[0], details[1], details[2], details[3], details[4], details[5], details[6]);
+        }
+
+    }
+
+    void Filing::add_new_admin(admin* obj)
+    {
+        ofstream details_file(FILE_PATH + "admin_details.csv", ios::app);
+        ofstream login_file(FILE_PATH + "admin_login_details.txt", ios::app);
+
+        if (!details_file || !login_file)
+        {
+            //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
+        }
+        else
+        {
+            details_file << obj->file_details();
+            login_file << obj->file_logindetails();
+
+            details_file.close();
+            login_file.close();
+        }
+    }
+    void Filing::store_deleted_admins(string username, admin* arr, int size)
+    {
+        ofstream details_file(FILE_PATH + "admin_details.csv");
+
+
+        if (!details_file)
+        {
+            print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv\n\n");
+        }
+        else
+        {
+            for (int i = 0; i < size; i++)
+            {
+                details_file << arr[i].file_details();
+            }
+
+            details_file.close();
+        }
+
+        vector<string> o_username, o_pass;
+        string un, pass;
+        int count = 0;;
+
+        ifstream login_input_file(FILE_PATH + "admin_login_details.txt");
+
+        while (!login_input_file.eof())
+        {
+            login_input_file >> un >> pass;
+            o_username.push_back(un);
+            o_pass.push_back(pass);
+            count++;
+        }
+        login_input_file.close();
+
+        ofstream login_output_file(FILE_PATH + "admin_login_details.txt");
+
+        for (int i = 0; i < count; i++)
+        {
+            if (username != o_username[i])
+            {
+                login_output_file << o_username[i] << " " << o_pass[i] << endl;
+            }
+        }
+
+        login_output_file.close();
+    }
+    void Filing::store_updated_admins(string username, admin* arr, int size)
+    {
+        ofstream details_file(FILE_PATH + "admin_details.csv");
+
+
+        if (!details_file)
+        {
+            //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
+        }
+        else
+        {
+            for (int i = 0; i < size; i++)
+            {
+                details_file << arr[i].file_details();
+            }
+
+            details_file.close();
+        }
+
+        vector<string> o_username, o_pass;
+        string un, pass;
+        int count = 0;;
+
+        ifstream login_input_file(FILE_PATH + "admin_login_details.txt");
+
+        while (!login_input_file.eof())
+        {
+            login_input_file >> un >> pass;
+            o_username.push_back(un);
+            o_pass.push_back(pass);
+            count++;
+        }
+        login_input_file.close();
+
+        ofstream login_output_file(FILE_PATH + "admin_login_details.txt");
+
+        for (int i = 0; i < count; i++)
+        {
+            if (username == o_username[i])
+            {
+                login_output_file << arr[i].file_logindetails();
+            }
+            else
+            {
+                login_output_file << o_username[i] << " " << o_pass[i] << endl;
+            }
+        }
+
+        login_output_file.close();
+    }
+
+    bool Filing::find_doctor(string username)
+    {
+        ifstream login_file(FILE_PATH + "doctor_login_details.txt");
+
+        bool found = false;
+        string o_username, o_pass;
+
+
+        while (!login_file.eof())
+        {
+            login_file >> o_username >> o_pass;  // reads original username from the file
+            if (username == o_username)
+            {
+                found = true;
+                break;
+            }
+            login_file >> o_username >> o_pass;
+        }
+        login_file.close();
+
+        return found;
+    }
+    bool Filing::is_valid_login_doctor(string username, string pass)
+    {
+        ifstream login_file(FILE_PATH + "doctor_login_details.txt");
+
+        bool logined = false;
+        string o_username, o_pass;
+
+
+        while (!login_file.eof())
+        {
+            login_file >> o_username >> o_pass; // reads original username from the file
+            if (username == o_username)
+            {
+                pass = encrypt(username, pass);
+
+                if (pass == o_pass)
+                {
+                    logined = true;
+                    break;
+                }
+            }
+
+        }
+        login_file.close();
+
+        return logined;
+    }
+    void Filing::add_new_doctor(doctor* obj)
+    {
+        ofstream details_file(FILE_PATH + "doctor_details.csv", ios::app);
+        ofstream login_file(FILE_PATH + "doctor_login_details.txt", ios::app);
+
+        if (!details_file || !login_file)
+        {
+            //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
+        }
+        else
+        {
+            details_file << obj->file_details();
+            login_file << obj->file_logindetails();
+
+            details_file.close();
+            login_file.close();
+        }
+    }
+    void Filing::store_deleted_doctors(string username, doctor* arr, int size)
+    {
+        ofstream details_file(FILE_PATH + "doctor_details.csv");
+
+
+        if (!details_file)
+        {
+            //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
+        }
+        else
+        {
+            for (int i = 0; i < size; i++)
+            {
+                details_file << arr[i].file_details();
+            }
+
+            details_file.close();
+        }
+
+        vector<string> o_username, o_pass;
+        string un, pass;
+        int count = 0;;
+
+        ifstream login_input_file(FILE_PATH + "doctor_login_details.txt");
+
+        while (!login_input_file.eof())
+        {
+            login_input_file >> un >> pass;
+            o_username.push_back(un);
+            o_pass.push_back(pass);
+            count++;
+        }
+        login_input_file.close();
+
+        ofstream login_output_file(FILE_PATH + "doctor_login_details.txt");
+
+        for (int i = 0; i < count; i++)
+        {
+            if (username != o_username[i])
+            {
+                login_output_file << o_username[i] << " " << o_pass[i] << endl;
+            }
+        }
+
+        login_output_file.close();
+    }
+    void Filing::store_updated_doctors(string username, doctor* arr, int size)
+    {
+        ofstream details_file(FILE_PATH + "doctor_details.csv");
+
+
+        if (!details_file)
+        {
+            //print_error("\n\nERROR IN OPENING THE FILE: doctor_details.csv or admin_login_details.txt\n\n");
+        }
+        else
+        {
+            for (int i = 0; i < size; i++)
+            {
+                details_file << arr[i].file_details();
+            }
+            details_file.close();
+        }
+
+        vector<string> o_username, o_pass;
+        string un, pass;
+        int count = 0;;
+
+        ifstream login_input_file(FILE_PATH + "doctor_login_details.txt");
+
+        while (!login_input_file.eof())
+        {
+            login_input_file >> un >> pass;
+            o_username.push_back(un);
+            o_pass.push_back(pass);
+            count++;
+        }
+        login_input_file.close();
+
+        ofstream login_output_file(FILE_PATH + "doctor_login_details.txt");
+
+        for (int i = 0; i < count; i++)
+        {
+            if (username == o_username[i])
+            {
+                login_output_file << arr[i].file_logindetails();
+            }
+            else
+            {
+                login_output_file << o_username[i] << " " << o_pass[i] << endl;
+            }
+        }
+
+        login_output_file.close();
+    }
+
+    bool Filing::find_fdo(string username)
+    {
+        ifstream login_file(FILE_PATH + "fdo_login_details.txt");
+
+        bool found = false;
+        string o_username, o_pass;
+
+
+        while (!login_file.eof())
+        {
+            login_file >> o_username >> o_pass;  // reads original username from the file
+            if (username == o_username)
+            {
+                found = true;
+                break;
+            }
+            login_file >> o_username >> o_pass;
+        }
+        login_file.close();
+
+        return found;
+    }
+    bool Filing::is_valid_login_fdo(string username, string pass)
+    {
+        ifstream login_file(FILE_PATH + "fdo_login_details.txt");
+
+        bool logined = false;
+        string o_username, o_pass;
+
+
+        while (!login_file.eof())
+        {
+            login_file >> o_username >> o_pass; // reads original username from the file
+            if (username == o_username)
+            {
+                pass = encrypt(username, pass);
+
+                if (pass == o_pass)
+                {
+                    logined = true;
+                    break;
+                }
+            }
+        }
+        login_file.close();
+
+        return logined;
+    }
+    void Filing::initiate_all_fdo(fdo*& fdos_list, int& fdo_count)
+    {
+        ifstream details_file(FILE_PATH + "fdo_details.csv");
+        int count = 0;
+        string line, word;
+        string fdo_details[15], v_details[6];
+        //string houseID limit total_vac_amount vaccineCount
+
+        cout << "ware\n";
+        while (getline(details_file, line))
+        {
+            cout << "fdo\n";
+            count = 0;
+            stringstream str(line);
+
+            while (getline(str, word, ','))
+            {
+                cout << word << endl;
+                fdo_details[count++] = word;
+            }
+
+            expand<fdo>(fdos_list, fdo_count);
+
+            fdos_list[fdo_count - 1].load_data(fdo_details[0], fdo_details[1], fdo_details[2], fdo_details[3], fdo_details[4], fdo_details[5], fdo_details[6], fdo_details[7], "0", fdo_details[9], fdo_details[10], fdo_details[11], fdo_details[12], fdo_details[13], fdo_details[14]);
+
+
+            for (int i = 0; i < stoi(fdo_details[8]); i++)
+            {
+                count = 0;
+                getline(details_file, line);
+                stringstream str1(line);
+
+                while (getline(str1, word, ','))
+                {
+                    v_details[count++] = word;
+                }
+
+                fdos_list[fdo_count - 1].load_vaccine(v_details[0], v_details[1], v_details[2], v_details[3], v_details[4], v_details[5]);
+            }
+        }
+
+    }
+    void Filing::add_new_fdo(fdo* obj)
+    {
+        ofstream details_file(FILE_PATH + "fdo_details.csv", ios::app);
+        ofstream login_file(FILE_PATH + "fdo_login_details.txt", ios::app);
+
+        if (!details_file || !login_file)
+        {
+            //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
+        }
+        else
+        {
+            details_file << obj->file_details();
+            login_file << obj->file_logindetails();
+
+            details_file.close();
+            login_file.close();
+        }
+    }
+    void Filing::add_new_fdo_vaccine(string ID, fdo* fdoobj, vaccines* obj)
+    {
+        ifstream details_file(FILE_PATH + "fdo_details.csv");
+        ofstream temp(FILE_PATH + "temp.csv");
+
+        string line, word;
+
+        int count = 0;
+        string details[15];
+        //username firstname lastname email contactNumber CNIC vacCenterName, city vacCount doc_username firstname lastname email contactNumber CNIC
+
+        if (!details_file)
+        {
+            //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
+        }
+        else
+        {
+
+            while (getline(details_file, line))
+            {
+                count = 0;
+                stringstream str(line);
+                while (getline(str, word, ','))
+                {
+                    details[count++] = word;
+                }
+
+                if (details[0] != ID)
+                {
+                    temp << line;
+
+                    if (line.size() != 0)
+                        if (line[line.size() - 1] != '\n')
+                            temp << "\n";
+
+                }
+                else
+                {
+                    temp << fdoobj->file_details();
+                }
+
+                for (int i = 0; i < stoi(details[8]); i++)
+                {
+                    getline(details_file, line);
+                    temp << line;
+
+                    if (line.size() != 0)
+                        if (line[line.size() - 1] != '\n')
+                            temp << "\n";
+                }
+
+                if (details[0] == ID)
+                {
+
+                    temp << obj->file_details();
+                }
+
+            }
+
+            details_file.close();
+            temp.close();
+
+            ofstream details_file("fdo_details.csv");
+            ifstream temp("temp.csv");
+
+            while (getline(temp, line))
+            {
+                details_file << line;
+
+                if (line.size() != 0)
+                    if (line[line.size() - 1] != '\n')
+                    {
+                        details_file << "\n"; //Pakistani tughe salaam :))
+                    }
+            }
+
+            details_file.close();
+            temp.close();
+        }
+    }
+    void Filing::store_deleted_fdos(string username, fdo* arr, int size)
+    {
+        ofstream details_file(FILE_PATH + "fdo_details.csv");
+
+
+        if (!details_file)
+        {
+            //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
+        }
+        else
+        {
+            for (int i = 0; i < size; i++)
+            {
+                details_file << arr[i].file_details();
+            }
+            details_file.close();
+        }
+
+        vector<string> o_username, o_pass;
+        string un, pass;
+        int count = 0;;
+
+        ifstream login_input_file(FILE_PATH + "fdo_login_details.txt");
+
+        while (!login_input_file.eof())
+        {
+            login_input_file >> un >> pass;
+            o_username.push_back(un);
+            o_pass.push_back(pass);
+            count++;
+        }
+        login_input_file.close();
+
+        ofstream login_output_file(FILE_PATH + "fdo_login_details.txt");
+
+        for (int i = 0; i < count; i++)
+        {
+            if (username != o_username[i])
+            {
+                login_output_file << o_username[i] << " " << o_pass[i] << endl;
+            }
+        }
+
+        login_output_file.close();
+    }
+    void Filing::store_updated_fdos(string username, fdo* arr, int size)
+    {
+        ofstream details_file(FILE_PATH + "fdo_details.csv");
+
+
+        if (!details_file)
+        {
+            //print_error("\n\nERROR IN OPENING THE FILE: fdo_details.csv or admin_login_details.txt\n\n");
+        }
+        else
+        {
+            for (int i = 0; i < size; i++)
+            {
+                details_file << arr[i].file_details();
+            }
+            details_file.close();
+        }
+
+        vector<string> o_username, o_pass;
+        string un, pass;
+        int count = 0;;
+
+        ifstream login_input_file(FILE_PATH + "fdo_login_details.txt");
+
+        while (!login_input_file.eof())
+        {
+            login_input_file >> un >> pass;
+            o_username.push_back(un);
+            o_pass.push_back(pass);
+            count++;
+        }
+        login_input_file.close();
+
+        ofstream login_output_file(FILE_PATH + "fdo_login_details.txt");
+
+        for (int i = 0; i < count; i++)
+        {
+            if (username == o_username[i])
+            {
+                login_output_file << arr[i].file_logindetails();
+            }
+            else
+            {
+                login_output_file << o_username[i] << " " << o_pass[i] << endl;
+            }
+        }
+
+        login_output_file.close();
+    }
+
+    bool Filing::find_gov_off(string username)
+    {
+        ifstream login_file(FILE_PATH + "gov_off_login_details.txt");
+
+        bool found = false;
+        string o_username, o_pass;
+
+
+        while (!login_file.eof())
+        {
+            login_file >> o_username >> o_pass;  // reads original username from the file
+            if (username == o_username)
+            {
+                found = true;
+                break;
+            }
+            login_file >> o_username >> o_pass;
+        }
+        login_file.close();
+
+        return found;
+    }
+    bool Filing::is_valid_login_gov_off(string username, string pass)
+    {
+        ifstream login_file(FILE_PATH + "gov_off_login_details.txt");
+
+        bool logined = false;
+        string o_username, o_pass;
+
+
+        while (!login_file.eof())
+        {
+            login_file >> o_username >> o_pass; // reads original username from the file
+            if (username == o_username)
+            {
+                pass = encrypt(username, pass);
+
+                if (pass == o_pass)
+                {
+                    logined = true;
+                    break;
+                }
+            }
+        }
+        login_file.close();
+
+        return logined;
+    }
+    void Filing::initiate_all_gov_off(gov_off*& gov_off_list, int& gov_off_count)
+    {
+        ifstream details_file(FILE_PATH + "gov_off_details.csv");
+        int count = 0;
+        string line, word;
+        string details[6];
+        //string o_username, fn, ln, em, cn, No;
+
+        while (getline(details_file, line))
+        {
+            count = 0;
+            stringstream str(line);
+
+            while (getline(str, word, ','))
+            {
+                details[count++] = word;
+            }
+            //cout << details[0] << endl;
+            //cout << admin_count << endl;
+            expand<gov_off>(gov_off_list, gov_off_count);
+
+            gov_off_list[gov_off_count - 1].load_gov_off_data(details[0], details[1], details[2], details[3], details[4], details[5]);
+        }
+
+    }
+    void Filing::add_new_gov_off(gov_off* obj)
+    {
+        ofstream details_file(FILE_PATH + "gov_off_details.csv", ios::app);
+        ofstream login_file(FILE_PATH + "gov_off_login_details.txt", ios::app);
+
+        if (!details_file || !login_file)
+        {
+            //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
+        }
+        else
+        {
+            details_file << obj->file_details() << endl;
+            login_file << obj->file_logindetails();
+
+            details_file.close();
+            login_file.close();
+        }
+    }
+    void Filing::store_deleted_gov_offs(string username, gov_off* arr, int size)
+    {
+        ofstream details_file(FILE_PATH + "gov_off_details.csv");
+
+
+        if (!details_file)
+        {
+            //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
+        }
+        else
+        {
+            for (int i = 0; i < size; i++)
+            {
+                details_file << arr[i].file_details() << endl;
+            }
+            details_file.close();
+        }
+
+        vector<string> o_username, o_pass;
+        string un, pass;
+        int count = 0;;
+
+        ifstream login_input_file(FILE_PATH + "gov_off_login_details.txt");
+
+        while (!login_input_file.eof())
+        {
+            login_input_file >> un >> pass;
+            o_username.push_back(un);
+            o_pass.push_back(pass);
+            count++;
+        }
+        login_input_file.close();
+
+        ofstream login_output_file(FILE_PATH + "gov_off_login_details.txt");
+
+        for (int i = 0; i < count; i++)
+        {
+            if (username != o_username[i])
+            {
+                login_output_file << o_username[i] << " " << o_pass[i] << endl;
+            }
+        }
+
+        login_output_file.close();
+    }
+    void Filing::store_updated_gov_offs(string username, gov_off* arr, int size)
+    {
+        ofstream details_file(FILE_PATH + "gov_off_details.csv");
+
+
+        if (!details_file)
+        {
+            //print_error("\n\nERROR IN OPENING THE FILE: gov_off_details.csv or admin_login_details.txt\n\n");
+        }
+        else
+        {
+            for (int i = 0; i < size; i++)
+            {
+                details_file << arr[i].file_details() << endl;
+            }
+            details_file.close();
+        }
+
+        vector<string> o_username, o_pass;
+        string un, pass;
+        int count = 0;;
+
+        ifstream login_input_file(FILE_PATH + "gov_off_login_details.txt");
+
+        while (!login_input_file.eof())
+        {
+            login_input_file >> un >> pass;
+            o_username.push_back(un);
+            o_pass.push_back(pass);
+            count++;
+        }
+        login_input_file.close();
+
+        ofstream login_output_file(FILE_PATH + "gov_off_login_details.txt");
+
+        for (int i = 0; i < count; i++)
+        {
+            if (username == o_username[i])
+            {
+                login_output_file << arr[i].file_logindetails();
+            }
+            else
+            {
+                login_output_file << o_username[i] << " " << o_pass[i] << endl;
+            }
+        }
+
+        login_output_file.close();
+    }
+
+    void Filing::initiate_all_companies(company*& companies_list, int& companies_count)
+    {
+        ifstream details_file(FILE_PATH + "company_details.csv");
+        int count = 0;
+        string line, word;
+        string details[7];
+        //string cname LbNo vID vName NoDoses price, quantity;
+
+        while (getline(details_file, line))
+        {
+            count = 0;
+            stringstream str(line);
+
+            while (getline(str, word, ','))
+            {
+                details[count++] = word;
+            }
+
+            expand<company>(companies_list, companies_count);
+
+            companies_list[companies_count - 1].load_data(details[0], details[1], details[2], details[3], details[4], details[5], details[6]);
+        }
+
+    }
+    void Filing::add_new_company(company* obj)
+    {
+        ofstream details_file(FILE_PATH + "company_details.csv", ios::app);
+
+        if (!details_file)
+        {
+            //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
+        }
+        else
+        {
+            details_file << obj->file_details();
+
+            details_file.close();
+        }
+    }
+    void Filing::store_companies(company* arr, int size)
+    {
+        ofstream details_file(FILE_PATH + "company_details.csv");
+
+
+        if (!details_file)
+        {
+            //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
+        }
+        else
+        {
+            for (int i = 0; i < size; i++)
+            {
+                details_file << arr[i].file_details();
+            }
+            details_file.close();
+        }
+    }
+
+    void Filing::initiate_all_warehouses(warehouse*& warehouses_list, int& warehouse_count)
+    {
+        ifstream details_file(FILE_PATH + "warehouse_details.csv");
+        int count = 0;
+        string line, word;
+        string w_details[4], v_details[6];
+        //string houseID limit total_vac_amount vaccineCount
+
+        cout << "ware\n";
+        while (getline(details_file, line))
+        {
+            cout << "warehouse\n";
+            count = 0;
+            stringstream str(line);
+
+            while (getline(str, word, ','))
+            {
+                cout << word << endl;
+                w_details[count++] = word;
+            }
+
+            expand<warehouse>(warehouses_list, warehouse_count);
+
+            warehouses_list[warehouse_count - 1].load_data(w_details[0], w_details[1], w_details[2], "0");
+
+
+            for (int i = 0; i < stoi(w_details[3]); i++)
+            {
+                count = 0;
+                getline(details_file, line);
+                stringstream str1(line);
+
+                while (getline(str1, word, ','))
+                {
+                    v_details[count++] = word;
+                }
+
+                warehouses_list[warehouse_count - 1].load_vaccine(v_details[0], v_details[1], v_details[2], v_details[3], v_details[4], v_details[5]);
+            }
+        }
+
+    }
+    void Filing::add_new_warehouse(warehouse* obj)
+    {
+        ofstream details_file(FILE_PATH + "warehouse_details.csv", ios::app);
+
+        if (!details_file)
+        {
+            //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
+        }
+        else
+        {
+            details_file << obj->file_details();
+
+            details_file.close();
+        }
+    }
+    void Filing::add_new_warehouse_vaccine(string ID, warehouse* wareobj, vaccines* obj)
+    {
+        ifstream details_file(FILE_PATH + "warehouse_details.csv");
+        ofstream temp(FILE_PATH + "temp.csv");
+
+        string line;
+        string warehouseID, limit, vacamt, vacCount;
+
+        if (!details_file)
+        {
+            //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
+        }
+        else
+        {
+
+            while (getline(details_file, line))
+            {
+                stringstream str(line);
+                getline(str, warehouseID, ',');
+                getline(str, limit, ',');
+                getline(str, vacamt, ',');
+                getline(str, vacCount, ',');
+
+                if (warehouseID != ID)
+                {
+                    temp << line;
+
+                    if (line.size() != 0)
+                        if (line[line.size() - 1] != '\n')
+                            temp << "\n";
+
+                }
+                else
+                {
+                    temp << wareobj->file_details();
+                }
+
+                for (int i = 0; i < stoi(vacCount); i++)
+                {
+                    getline(details_file, line);
+                    temp << line;
+
+                    if (line.size() != 0)
+                        if (line[line.size() - 1] != '\n')
+                            temp << "\n";
+                }
+
+                if (warehouseID == ID)
+                {
+
+                    temp << obj->file_details();
+                }
+
+            }
+
+            details_file.close();
+            temp.close();
+
+            ofstream details_file("warehouse_details.csv");
+            ifstream temp("temp.csv");
+
+            while (getline(temp, line))
+            {
+                details_file << line;
+
+                if (line.size() != 0)
+                    if (line[line.size() - 1] != '\n')
+                    {
+                        details_file << "\n"; //Pakistani tughe salaam :))
+                    }
+            }
+
+            details_file.close();
+            temp.close();
+        }
+    }
+    void Filing::delete_warehouse_vaccine(string ID, warehouse* obj, string vID, string bID)
+    {
+        ifstream details_file(FILE_PATH + "warehouse_details.csv");
+        ofstream temp(FILE_PATH + "temp.csv");
+
+        string line;
+        string warehouseID, limit, vacamt, vacCount;
+        string vacID, batchID;
+
+        if (!details_file)
+        {
+            //print_error("\n\nERROR IN OPENING THE FILE: admin_details.csv or admin_login_details.txt\n\n");
+        }
+        else
+        {
+
+            while (getline(details_file, line))
+            {
+                stringstream str(line);
+                getline(str, warehouseID, ',');
+                getline(str, limit, ',');
+                getline(str, vacamt, ',');
+                getline(str, vacCount, ',');
+
+
+
+                if (warehouseID == ID)
+                {
+                    temp << obj->file_details();
+                    for (int i = 0; i < stoi(vacCount); i++)
+                    {
+                        getline(details_file, line);
+
+                        stringstream str1(line);
+                        getline(str1, vacID, ',');
+                        getline(str1, batchID, ',');
+
+                        if (vID != vacID || bID != batchID)
+                        {
+                            temp << line;
+
+                            if (line.size() != 0)
+                                if (line[line.size() - 1] != '\n')
+                                    temp << "\n";
+                        }
+
+                    }
+                }
+                else
+                {
+                    temp << line;
+                    if (line.size() != 0)
+                        if (line[line.size() - 1] != '\n')
+                            temp << "\n";
+
+                    for (int i = 0; i < stoi(vacCount); i++)
+                    {
+                        getline(details_file, line);
+                        temp << line;
+
+                        if (line.size() != 0)
+                            if (line[line.size() - 1] != '\n')
+                                temp << "\n";
+                    }
+                }
+
+            }
+
+            details_file.close();
+            temp.close();
+
+            ofstream details_file("warehouse_details.csv");
+            ifstream temp("temp.csv");
+
+            while (getline(temp, line))
+            {
+                details_file << line;
+
+                if (line.size() != 0)
+                    if (line[line.size() - 1] != '\n')
+                        details_file << "\n";
+            }
+
+            details_file.close();
+            temp.close();
+        }
+    }
+
+    bool Filing::find_citizen(string CNIC)
+    {
+        ifstream details_file(FILE_PATH + "citizen_details.csv");
+
+        int count = 0;
+        string line, word;
+        string details[9];
+        //string un fn ln em cn No Age bT City
+
+        while (getline(details_file, line))
+        {
+            count = 0;
+            stringstream str(line);
+
+            while (getline(str, word, ','))
+            {
+                details[count++] = word;
+            }
+
+            if (CNIC == details[4])
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    bool Filing::already_vacinated(string CNIC)
+    {
+        ifstream details_file(FILE_PATH + "citizen_vac.csv");
+        string line, word;
+        string c, vac, vacDoses;
+        while (getline(details_file, line))
+        {
+
+            stringstream str(line);
+            getline(str, c, ',');
+            getline(str, vac, ',');
+            getline(str, vacDoses, ',');
+
+
+            if (CNIC == c)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    void Filing::add_new_citizen(citizen* obj)
+    {
+        ofstream details_file(FILE_PATH + "citizen_details.csv", ios::app);
+
+        if (!details_file)
+        {
+            print_error("\n\nERROR IN OPENING THE FILE: citizen_details.csv\n\n");
+        }
+        else
+        {
+            details_file << obj->file_details();
+
+            details_file.close();
+        }
+    }
+    citizen Filing::load_citizen(string CNIC)
+    {
+        ifstream details_file(FILE_PATH + "citizen_details.csv");
+
+        int count = 0;
+        string line, word;
+        string details[9];
+        //string un fn ln em cn No Age bT City
+
+        while (getline(details_file, line))
+        {
+            count = 0;
+            stringstream str(line);
+
+            while (getline(str, word, ','))
+            {
+                details[count++] = word;
+            }
+
+            if (CNIC == details[4])
+            {
+                return citizen(details[0], details[1], details[2], details[3], details[4], details[5], details[6], details[7], details[8]);
+            }
+        }
+
+    }
+    void Filing::store_vac_citizen(string cnic, vaccines* vac)
+    {
+        ofstream details_file(FILE_PATH + "citizen_vac.csv", ios::app);
+
+        details_file << cnic + "," + vac->get_vacID() + "," + to_string(vac->get_Nofdoses()-1) + ",\n";
+
+        details_file.close();
+    }
+    void Filing::reduce_vac_doses(string cnic)
+    {
+
+        ifstream details_file(FILE_PATH + "citizen_vac.csv");
+        ofstream temp(FILE_PATH + "temp.csv");
+
+        int count = 0;
+        string line, word;
+        string details[3];
+        //string cnic vacID VacDoses
+
+        while (getline(details_file, line))
+        {
+            count = 0;
+            stringstream str(line);
+
+            while (getline(str, word, ','))
+            {
+                details[count++] = word;
+            }
+
+            if (cnic == details[0])
+            {
+                temp << details[0] + "," + details[1] + "," + to_string(stoi(details[2])-1) + ",\n";
+            }
+            else
+            {
+                temp << line;
+
+                if (line.size() != 0)
+                    if (line[line.size() - 1] != '\n')
+                        temp << "\n";
+            }
+        }
+
+        details_file.close();
+        temp.close();
+
+        ofstream detail_file("citizen_vac.csv");
+        ifstream temp1("temp.csv");
+
+        while (getline(temp1, line))
+        {
+            detail_file << line;
+
+            if (line.size() != 0)
+                if (line[line.size() - 1] != '\n')
+                {
+                    detail_file << "\n"; //Pakistani tughe salaam :))
+                }
+        }
+
+        details_file.close();
+        temp.close();
+
+    }
+
+    int Filing::get_remaining_doses(string cnic)
+    {
+
+        ifstream details_file(FILE_PATH + "citizen_vac.csv");
+
+
+        int count = 0;
+        string line, word;
+        string details[3];
+        //string cnic vacID VacDoses
+
+        while (getline(details_file, line))
+        {
+            count = 0;
+            stringstream str(line);
+
+            while (getline(str, word, ','))
+            {
+                details[count++] = word;
+            }
+
+            if (cnic == details[0])
+            {
+                return stoi(details[2]);
+            }
+            
+        }
+
+        details_file.close();
+
+    }
+    string Filing::get_citizen_vacID(string cnic)
+    {
+
+        ifstream details_file(FILE_PATH + "citizen_vac.csv");
+
+
+        int count = 0;
+        string line, word;
+        string details[3];
+        //string cnic vacID VacDoses
+
+        while (getline(details_file, line))
+        {
+            count = 0;
+            stringstream str(line);
+
+            while (getline(str, word, ','))
+            {
+                details[count++] = word;
+            }
+
+            if (cnic == details[0])
+            {
+                return details[1];
+            }
+
+        }
+
+        details_file.close();
+
+    }
+
+    int Filing::get_num_registered_citizens()
+    {
+        ifstream details_file(FILE_PATH + "citizen_details.csv");
+
+        int count = 0;
+        string line;
+        //string un fn ln em cn No Age bT City
+
+        while (getline(details_file, line))
+        {
+            count++;
+        }
+        details_file.close();
+        return count;
+    }
+    int Filing::get_num_vacinated()
+    {
+
+        ifstream details_file(FILE_PATH + "citizen_vac.csv");
+
+        int num = 0;;
+        int count = 0;
+        string line, word;
+        string details[3];
+        //string cnic vacID VacDoses
+
+        while (getline(details_file, line))
+        {
+            count = 0;
+            stringstream str(line);
+
+            while (getline(str, word, ','))
+            {
+                details[count++] = word;
+            }
+
+            if (stoi(details[2]) == 0)
+            {
+                num++;
+            }
+
+        }
+
+        details_file.close();
+        return num;
+    }
+    int Filing::get_num_partially_vacinated()
+    {
+
+        ifstream details_file(FILE_PATH + "citizen_vac.csv");
+
+        int num = 0;;
+        int count = 0;
+        string line, word;
+        string details[3];
+        //string cnic vacID VacDoses
+
+        while (getline(details_file, line))
+        {
+            count = 0;
+            stringstream str(line);
+
+            while (getline(str, word, ','))
+            {
+                details[count++] = word;
+            }
+
+            if (stoi(details[2]) != 0)
+            {
+                num++;
+            }
+
+        }
+
+        details_file.close();
+        return num;
+    }
+    bool Filing::display_citizen_with_VacID(string ID)
+    {
+        ifstream details_file(FILE_PATH + "citizen_vac.csv");
+
+        citizen temp_ctz;
+        bool found = false;
+        int count = 0;
+        string line, word;
+        string details[3];
+        //string cnic vacID VacDoses
+
+        while (getline(details_file, line))
+        {
+            count = 0;
+            stringstream str(line);
+
+            while (getline(str, word, ','))
+            {
+                details[count++] = word;
+            }
+
+            if (details[1] == ID)
+            {
+                found = true;
+
+                temp_ctz = load_citizen(details[0]);
+                temp_ctz.citizen_output();
+                cout << "\n";
+            }
+
+        }
+
+        details_file.close();
+        return found;
+    }
+    bool Filing::display_num_vacinated()
+    {
+
+        ifstream details_file(FILE_PATH + "citizen_vac.csv");
+
+        citizen temp_ctz;
+        bool found = false;
+
+        int count = 0;
+        string line, word;
+        string details[3];
+        //string cnic vacID VacDoses
+
+        while (getline(details_file, line))
+        {
+            count = 0;
+            stringstream str(line);
+
+            while (getline(str, word, ','))
+            {
+                details[count++] = word;
+            }
+
+            if (stoi(details[2]) == 0)
+            {
+                found = true;
+
+                temp_ctz = load_citizen(details[0]);
+                temp_ctz.citizen_output();
+                cout << "\n";
+            }
+
+        }
+
+        details_file.close();
+        return found;
+    }
+    bool Filing::display_num_partially_vacinated()
+    {
+
+        ifstream details_file(FILE_PATH + "citizen_vac.csv");
+
+        citizen temp_ctz;
+        bool found = false;
+
+        int count = 0;
+        string line, word;
+        string details[3];
+        //string cnic vacID VacDoses
+
+        while (getline(details_file, line))
+        {
+            count = 0;
+            stringstream str(line);
+
+            while (getline(str, word, ','))
+            {
+                details[count++] = word;
+            }
+
+            if (stoi(details[2]) != 0)
+            {
+                found = true;
+
+                temp_ctz = load_citizen(details[0]);
+                temp_ctz.citizen_output();
+                cout << "\n";
+            }
+
+        }
+
+        details_file.close();
+        return found;
+    }
+
+
+    //----------------------------------------------------------------------------------------------------------------

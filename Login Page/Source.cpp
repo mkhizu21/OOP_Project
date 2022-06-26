@@ -92,25 +92,25 @@ void wait(int x = 200)
 void loading_animation()
 {
 	wait(1000);
-	system("clear");
+	system("cls");
 	cout << "\n\n\n\n\n\n\n\n" << banner0;
 	wait();
-	system("clear");
+	system("cls");
 	cout << "\n\n\n\n\n\n\n\n" << banner1;
 	wait();
-	system("clear");
+	system("cls");
 	cout << "\n\n\n\n\n\n\n\n" << banner2;
 	wait();
-	system("clear");
+	system("cls");
 	cout << "\n\n\n\n\n\n\n\n" << banner3;
 	wait();
-	system("clear");
+	system("cls");
 	cout << "\n\n\n\n\n\n\n\n" << banner4;
 	wait();
-	system("clear");
+	system("cls");
 	cout << "\n\n\n\n\n\n\n\n" << banner5;
 	wait();
-	system("clear");
+	system("cls");
 	cout << "\n\n\n\n\n\n\n\n" << banner;
 
 	for (int i = 0; i < 5; i++)
@@ -222,6 +222,8 @@ void super_admin_page(string username)
 	bool loop = true;
 	char choice;
 	super_admin* SA = Filing::login_super_admin(username);
+
+
 	while (loop)
 	{
 		heading("SUPER ADMIN MENU");
@@ -239,7 +241,15 @@ void super_admin_page(string username)
 		print_spaces();
 		cout << "6. Display FDOs\n";
 		print_spaces();
-		cout << "7. Exit\n";
+		cout << "7. Create Government Official\n";
+		print_spaces();
+		cout << "8. Remove Government Official\n";
+		print_spaces();
+		cout << "9. Update Government Official\n";
+		print_spaces();
+		cout << "0. Display Government Official\n";
+		print_spaces();
+		cout << "A. Exit\n";
 
 		print_spaces();
 		cout << "ENTER ANY OPTION";
@@ -285,11 +295,40 @@ void super_admin_page(string username)
 			SA->display_fdo();
 			break;
 
+		case '7':
+			heading("CREATE GOVERNMENT OFFICIAL");
 
-		default:
+			SA->create_gov_off();
+			break;
+
+		case '8':
+			heading("REMOVE GOVERNMENT OFFICIAL");
+
+			SA->delete_gov_off();
+			break;
+
+
+		case '9':
+			heading("UPDATE GOVERNMENT OFFICIAL");
+
+			SA->update_gov_off();
+			break;
+
+		case '0':
+			heading("DISPLAY GOVERNMENT OFFICIAL");
+
+			SA->display_gov_off();
+			break;
+		
+
+		case 'a':
 			print_error("\n\n[!] EXITING SUPER ADMIN MENU [!]\n");
 
 			loop = false;
+			break;
+
+		default:
+			print_error("\n\n[!] INVALID INPUT [!]\n");
 			break;
 		}
 
@@ -377,10 +416,14 @@ void admin_page(string username)
 
 			break;
 
-		default:
+		case '8':
 			print_error("\n\n[!] EXITING ADMIN MENU [!]\n");
 			
 			loop = false;
+			break;
+
+		default:
+			print_error("\n\n[!] INVALID INPUT [!]\n");
 			break;
 		}
 
@@ -407,9 +450,11 @@ void fdo_page(string username)
 		print_spaces();
 		cout << "1. Get Vaccine\n";
 		print_spaces();
-		cout << "2. Vaccinate Citizen\n";
+		cout << "2. Display Vaccines\n";
 		print_spaces();
-		cout << "3. Exit\n";
+		cout << "3. Vaccinate Citizen\n";
+		print_spaces();
+		cout << "4. Exit\n";
 
 		print_spaces();
 		cout << "ENTER ANY OPTION";
@@ -424,16 +469,120 @@ void fdo_page(string username)
 			break;
 
 		case '2':
+			heading("DISPLAY VACCINES");
+
+			FDO->output_vaccines();
+			break;
+
+		case '3':
 			heading("VACCINATE CITIZEN");
 
 			FDO->vacinate_citizen();
 			break;
 
 
-		default:
+		case '4':
 			print_error("\n\n[!] EXITING FDO MENU [!]\n");
 
 			loop = false;
+			break;
+
+		default:
+			print_error("\n\n[!] INVALID INPUT [!]\n");
+			break;
+		}
+
+		cout << "\n\nPRESS ANY KEY TO CONTINUE";
+		_getch();
+
+	}
+}
+
+void gov_off_page(string username)
+{
+	bool loop = true;
+	char choice;
+	gov_off* GOV = nullptr;
+	GOV = super_admin::gov_off_obj(username);
+
+	while (loop)
+	{
+		heading("GOVERNEMNT OFFICIAL MENU");
+
+		print_spaces();
+		cout << "1. Display Government Official details\n";
+		print_spaces();
+		cout << "2. Show percentage of vaccinated population\n";
+		print_spaces();
+		cout << "3. Show percentage of partially vaccinated population\n";
+		print_spaces();
+		cout << "4. Show fully vaccinated citizens \n";
+		print_spaces();
+		cout << "5. Show partially vaccinated citizens \n";
+		print_spaces();
+		cout << "6. Show citizens with specific vaccine ID\n";
+		print_spaces();
+		cout << "7. Display graph of vaccinated & partially vaccinated citizens\n";
+		print_spaces();
+		cout << "8. Exit\n";
+
+		print_spaces();
+		cout << "ENTER ANY OPTION";
+		choice = _getch();
+
+		switch (choice)
+		{
+		case '1':
+			heading("GOVERNMENT OFFICIAL DETAILS");
+			cout << "\n\n";
+			GOV->output();
+			break;
+
+		case '2':
+			heading("PERCENTAGE OF VACCINATED POPULATION");
+			cout << "\n\n";
+			GOV->percentage_vac_population();
+			break;
+
+		case '3':
+			heading("PERCENTAGE OF PARTIALLY VACCINATED POPULATION");
+			cout << "\n\n";
+			GOV->percentage_partially_vac_population();
+			break;
+
+		case '4':
+			heading("FULLY VACCINATED CITIZENS");
+			cout << "\n\n";
+			GOV->display_vac_population();
+			break;
+
+		case '5':
+			heading("PARTIALLY VACCINATED CITIZENS");
+			cout << "\n\n";
+			GOV->display_partially_vac_population();
+			break;
+
+		case '6':
+			heading("CITIZENS WITH SPECIFIC VACCINE ID");
+			cout << "\n\n";
+			GOV->display_citizen_with_VacID();
+			break;
+
+		case '7':
+			heading("GRAPH OF VACCINATED & PARTIALLY VACCINATED CITIZENS");
+			cout << "\n\n";
+			GOV->display_graph();
+			break;
+
+
+		case '8':
+			print_error("\n\n[!] EXITING GOVERNMENT OFFICIAL MENU [!]\n");
+
+			loop = false;
+			break;
+
+		default:
+			print_error("\n\n[!] INVALID INPUT [!]\n");
 			break;
 		}
 
@@ -459,12 +608,12 @@ void login_process(string username, string pass)
 				}
 				else
 				{
-					//throw wrong_password();
+					throw wrong_password();
 				}
 			}
 			else
 			{
-				//throw unregistered_username();
+				throw unregistered_username();
 			}
 		}
 		else if (mode == modes[1]) // Admin
@@ -477,12 +626,12 @@ void login_process(string username, string pass)
 				}
 				else
 				{
-					//throw wrong_password();
+					throw wrong_password();
 				}
 			}
 			else
 			{
-				//throw unregistered_username();
+				throw unregistered_username();
 			}
 		}
 		else if (mode == modes[2]) // Front Desk Officer
@@ -495,30 +644,30 @@ void login_process(string username, string pass)
 				}
 				else
 				{
-					//throw wrong_password();
+					throw wrong_password();
 				}
 			}
 			else
 			{
-				//throw unregistered_username();
+				throw unregistered_username();
 			}
 		}
-		else if (mode == modes[3]) // Government Offcial
+		else if (mode == modes[3]) // Government Offcial // ABHI BANA HI NAI ;-;
 		{
 			if (Filing::find_gov_off(username))
 			{
 				if (Filing::is_valid_login_gov_off(username, pass))
 				{
-					//gov_off_page(username);
+					gov_off_page(username);
 				}
 				else
 				{
-					//throw wrong_password();
+					throw wrong_password();
 				}
 			}
 			else
 			{
-				//throw unregistered_username();
+				throw unregistered_username();
 			}
 		}
 
@@ -626,11 +775,14 @@ int main()
 			register_citizen();
 			break;
 
-
-		default:
-			print_error("\n\n[!] EXITING FDO MENU [!]\n");
+		case '3':
+			print_error("\n\n[!] EXITING PROGRAM [!]\n");
 
 			loop = false;
+			break;
+
+		default:
+			print_error("\n\n[!] INVALID INPUT [!]\n");
 			break;
 		}
 
@@ -639,9 +791,5 @@ int main()
 
 	}
 
-
-
-
-	system("pause");
 	return 0;
 }
